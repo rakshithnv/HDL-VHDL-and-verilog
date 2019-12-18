@@ -1,0 +1,17 @@
+Listing 3.6?Verilog Code for Behavioral Description of a D-Latch
+      
+       module D_latch (d, E, Q, Qb);
+       input	 d, E;
+       output Q, Qb;
+       reg Q, Qb;
+       always @ (d, E)
+       begin
+           if (E == 1)
+               begin
+               Q = d;
+               Qb = ~ Q;
+               end
+           end
+       
+       endmodule
+

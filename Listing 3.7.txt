@@ -1,0 +1,50 @@
+Listing 3.7?HDL Code for a Positive Edge-Triggered JK Flip-Flop Using the Case Statement—VHDL and Verilog
+      
+      VHDL Positive Edge-Triggered JK Flip-Flop Using Case
+       library ieee;
+       use ieee.std_logic_1164.all;
+       entity JK_FF is
+       port(JK : in bit_vector (1 downto 0);
+       clk : in std_logic; q, qb : out bit);
+       end JK_FF;
+       
+       architecture JK_BEH of JK_FF is
+       begin 
+       P1 : process (clk) 
+       variable temp1, temp2 : bit;
+           begin
+               if rising_edge (clk) then
+       case JK is 
+       when "01" => temp1 := '0';
+       when "10" => temp1 := '1';
+       when "00" => temp1 := temp1;
+       when "11" => temp1 := not temp1;
+       end case;
+               q <= temp1; 
+               temp2 := not temp1;
+               qb <= temp2;
+               end if; 
+       end process P1;
+       
+       end JK_BEH;
+      
+      Verilog Positive Edge-Triggered JK Flip-Flop Using Case
+       module JK_FF (JK, clk, q, qb);
+       input [1:0] JK;
+       input clk;
+       output q, qb;
+       reg q, qb;
+       
+       always @ (posedge clk)
+       begin
+       case (JK)
+           2'd0 : q = q;
+           2'd1 : q = 0;
+           2'd2 : q = 1;
+           2'd3 : q =~ q;
+           endcase
+       qb =~ q;
+       end
+       
+       endmodule
+

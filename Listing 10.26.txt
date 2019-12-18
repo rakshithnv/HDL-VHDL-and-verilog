@@ -1,0 +1,43 @@
+Listing 10.26?Else-If Statement with Gate-Level Logic 
+       
+       package weather_fcst is
+       Type unit is (cent, half, offset);
+       
+       end package weather_fcst;
+       
+       library ieee;
+       use ieee.std_logic_1164.all;
+       
+       use work.weather_fcst.all; 
+       entity weather is
+           port (a : in unit; tempr : in integer range 0 to 15;
+               z : out integer range 0 to 15);
+       end weather;
+       
+       architecture weather of weather is
+       
+       begin
+       
+       T : process (a, tempr)
+       variable z_tem : integer range 0 to 15;
+           begin
+       
+               if ((tempr <= 7) and (a = cent)) then
+               z_tem := tempr;
+       
+               elsif ((tempr <= 7) and (a = offset)) then
+               z_tem := tempr + 4;
+       
+               elsif ((tempr <= 7) and (a = half)) then
+               z_tem := tempr /2;
+       
+               else
+               z_tem := 15;
+       
+               end if;
+       
+               z <= z_tem;
+           end process T;
+       
+       end weather;
+

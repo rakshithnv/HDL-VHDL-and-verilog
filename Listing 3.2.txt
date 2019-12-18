@@ -1,0 +1,65 @@
+Listing 3.2?HDL Description of a 2x1 Multiplexer Using IF-ELSE—VHDL and Verilog
+      
+      VHDL 2x1 Multiplexer Using IF-ELSE
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity MUX_if is
+       port (A, B, SEL, Gbar : in std_logic; Y : out std_logic); 
+       end MUX_if;
+       architecture MUX_bh of MUX_if is
+       begin
+       process (SEL, A, B, Gbar)
+       -- SEL, A, B, and Gbar are the sensitivity list of the process.
+       variable temp : std_logic;		    
+       
+       --It is common practice in behavioral description to use
+       --variable(s) rather than signal(s). This is done to avoid
+       --any timing errors that may arise due to the sequential
+       --execution of signal statements by the behavioral 
+       --description.  Execution of variable assignment statements
+       --is the same as in C language. After calculating the value
+       --of the variable, it is assigned to the output signal. 
+       --In this example, temp is calculated as the output of the 
+       --multiplexer. After calculation, temp is assigned to 
+          --the output signal Y.
+       
+       begin
+           if Gbar = '0' then
+               if SEL = '1' then
+                   temp := B;
+                   else
+                   temp := A;
+               end if;
+           Y <= temp;
+           else
+           Y <= 'Z';
+           end if; 
+       end process;
+       
+       end MUX_bh;
+      
+      Verilog 2x1 Multiplexer Using IF-ELSE
+       module mux2x1 (A, B, SEL, Gbar, Y);
+       input A, B, SEL, Gbar;
+       output Y;
+       reg Y;
+       always @ (SEL, A, B, Gbar)
+       begin
+           if (Gbar == 1)
+           Y = 1'bz;
+           else
+           begin
+               if (SEL)
+               Y = B;
+       /* This is a procedural assignment. Procedural assignments
+        are used to assign values to variables declared as regs 
+       (as Y here in this module). Procedural statements have 
+       to appear inside always, blocks, initial, tasks, or functions*/
+       
+               else
+               Y = A;
+           end
+       end
+       
+       endmodule
+      

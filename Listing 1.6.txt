@@ -1,0 +1,32 @@
+Listing 1.6 An Example of Data Flow  Description. a) VHDL. b) Verilog
+entity halfadder is							
+   port (							
+   a: in bit; 						
+   b: in bit;							
+   s: out bit; 						
+   c: out bit); 						
+   end halfadder;					
+   architecture HA_DtFl of halfadder is
+
+   --The architecture has no process, component, cmos, 
+   --tranif0, tran,or tranif0		 
+   
+   begin								    
+   	s <= a xor b; 			
+   	c <= a and b; 
+   end HA_DtFl;
+    
+    
+   b) Verilog Description
+
+   module halfadder (a,b,s,c);
+   input a;
+   input b; 
+   output s;
+   output c;
+   	assign s = a ^ b;   
+   	assign c = a & b; 
+    /* The module  has no always, gates such as and, cmos, 
+         tranif0, tran,or tranif0*/
+   endmodule
+

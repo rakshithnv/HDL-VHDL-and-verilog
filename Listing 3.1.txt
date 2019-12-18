@@ -1,0 +1,48 @@
+Listing 3.1?Example of an HDL Behavioral Description—VHDL and Verilog
+      
+      VHDL Behavioral Description
+       entity half_add is
+           port (I1, I2 : in bit; O1, O2 : out bit);
+               -- Since we are using type bit, 
+               --no need for attaching a Library.
+               -- If we use std_logic, we should attach 
+              --the IEEE Library.
+       
+       end half_add;
+       architecture behave_ex of half_add is
+       begin
+       process (I1, I2)
+           begin
+               O1 <= I1 xor I2 after 10 ns; -- statement 1
+               O2 <= I1 and I2 after 10 ns; -- statement 2
+       
+       -- The above two statements are signal-assignment statements
+       -- with 10 nanoseconds delays. 
+       --Other behavioral (sequential) statements can be added here
+           end process;
+       end behave_ex;
+        
+      Verilog Behavioral Description
+       module half_add (I1, I2, O1, O2);
+       input I1, I2;
+       output O1, O2;
+       reg O1, O2;
+       /* Since O1 and O2 are outputs and they are
+       written inside “always,” they should be
+       declared as reg */
+       always @(I1, I2)
+       
+           begin
+       
+               #10 O1 = I1 ^ I2; // statement 1.
+               #10 O2 = I1 & I2; // statement 2.
+       
+       /*The above two statements are procedural (inside always)
+        signal-assignment statements with 10 simulation screen 
+       units delay*/
+       
+       /*Other behavioral (sequential) statements can be added here*/
+       
+           end
+       endmodule
+      

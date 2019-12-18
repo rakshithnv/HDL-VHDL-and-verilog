@@ -1,0 +1,68 @@
+Listing 2.7?3-Bit Ripple-Carry Adder Case Study—VHDL and Verilog
+      
+      VHDL 3-Bit Ripple-Carry Adder Case Study Description
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity adders_RL is
+           port (x, y : in std_logic_vector (2 downto 0);
+           cin : in std_logic; 
+           sum : out std_logic_vector (2 downto 0);
+           cout : out std_logic); 
+       end adders_RL;
+       
+       --I. RIPPLE-CARRY ADDER 
+       
+       architecture RCarry_DtFl of adders_RL is
+       --Assume 4.0-ns propagation delay for all gates. 
+       signal c0, c1 : std_logic;
+       constant delay_gt : time := 4 ns;
+       
+       begin
+       sum(0) <= (x(0) xor y(0)) xor cin after 2*delay_gt;
+       
+       --Treat the above statement as two 2-input XOR. 
+       
+       sum(1) <= (x(1) xor y(1)) xor c0 after 2*delay_gt; 
+       
+       --Treat the above statement as two 2-input XOR. 
+       sum(2) <= (x(2) xor y(2)) xor c1 after 2*delay_gt;
+       --Treat the above statement as two 2-input XOR.
+       c0 <= (x(0) and y(0)) or (x(0) and cin) or (y(0) and cin)
+           after 2*delay_gt;
+       c1 <= (x(1) and y(1)) or (x(1) and c0) or (y(1) and c0)
+           after 2*delay_gt;
+       cout <= (x(2) and y(2)) or (x(2) and c1) or (y(2) and c1)
+           after 2*delay_gt;
+       end RCarry_DtFl;
+      
+      Verilog 3-Bit Ripple-Carry Adder Case Study Description
+       module adr_rcla (x, y, cin, sum, cout);
+       input [2:0] x, y;
+       input cin;
+       output [2:0] sum;
+       output cout;
+       // I. RIPPLE CARRY ADDER
+       wire c0, c1;
+       time delay_gt = 4;
+       //Assume 4.0-ns propagation delay for all gates. 
+       
+       assign #(2*delay_gt) sum[0] = (x[0] ^ y[0]) ^ cin;
+       //Treat the above statement as two 2-input XOR.
+       
+       assign #(2*delay_gt) sum[1] = (x[1] ^ y[1]) ^ c0;
+       //Treat the above statement as two 2-input XOR.
+       
+       assign #(2*delay_gt) sum[2] = (x[2] ^ y[2]) ^ c1;
+       //Treat the above statement as two 2-input XOR.
+       
+       assign #(2*delay_gt) c0 = (x[0] & y[0]) | (x[0] & cin)
+                                   | (y[0] & cin);
+       
+       
+       assign #(2*delay_gt) c1 = (x[1] & y[1]) | (x[1] & c0)
+                                  | (y[1] & c0);
+       
+       assign #(2*delay_gt) cout = (x[2] & y[2]) | (x[2] & c1) 
+                                   | (y[2] & c1);
+       endmodule
+

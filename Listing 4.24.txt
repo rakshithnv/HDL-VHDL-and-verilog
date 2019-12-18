@@ -1,0 +1,116 @@
+Listing 4.24?HDL Description of a 3-Bit Synchronous Decade Counter with Terminal Count—VHDL and Verilog
+      
+      VHDL 3-Bit Synchronous Decade Counter with Terminal Count
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity decade_ctr is
+           port (clk : in std_logic;
+           Q, Qbar : buffer std_logic_vector (3 downto 0);
+                TC : out std_logic);
+       end decade_ctr;
+       
+       architecture decade_str of decade_ctr is
+       --Some simulators will not allow mapping between
+       --buffer and out. In this
+       --case, change all out to buffer.
+       
+       component buf
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and4
+           port (I1, I2, I3, I4 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component or2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       
+       component or3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component D_FF
+           port (I1, I2 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       
+       
+       for all : D_FF use entity work.bind22 (D_FFMaster);
+       for all : buf use entity work.bind1 (buf_1);
+       for all : and2 use entity work.bind2 (and2_4);
+       for all : and3 use entity work.bind3 (and3_4);
+       for all : and4 use entity work.bind4 (and4_4);
+       for all : or2 use entity work.bind2 (or2_4);
+       for all : or3 use entity work.bind3 (or3_4);
+       signal s : std_logic_vector (6 downto 0);
+       signal D : std_logic_vector (3 downto 0);
+       begin
+       
+           b1 : buf port map (Qbar(0), D(0));
+           DFF0 : D_FF port map (D(0), clk, Q(0), Qbar(0));
+       
+       --Assume and gates and or gates have 4 ns propagation
+       --delay and invert has 1 ns.
+           a1 : and3 port map (Qbar(3), Qbar(1), Q(0), s(0));
+           a2 : and2 port map (Q(1), Qbar(0), s(1));
+           r1 : or2 port map (s(0), s(1), D(1));
+           DFF1 : D_FF port map (D(1), clk, Q(1), Qbar(1));
+           
+           a3 : and2 port map (Q(2), Qbar(1), s(2));
+           a4 : and2 port map (Q(2), Qbar(0), s(3));
+           a5 : and3 port map (Q(1), Q(0), Qbar(2), s(4));
+           r2 : or3 port map (s(2), s(3), s(4), D(2));
+           DFF2 : D_FF port map (D(2), clk, Q(2), Qbar(2));
+           
+           a6 : and2 port map (Q(3), Qbar(0), s(5));
+           a7 : and4 port map (Q(0), Q(1), Q(2), Qbar(3), s(6));
+           r3 : or2 port map (s(5), s(6), D(3));
+           DFF3 : D_FF port map (D(3), clk, Q(3), Qbar(3));
+           a8 : and4 port map (Q(0), Qbar(1), Qbar(2), Q(3), TC);
+       
+       end decade_str;
+      
+      Verilog 3-Bit Synchronous Decade Counter with Terminal Count
+       module decade_ctr (clk, Q, Qbar, TC);
+       input clk;
+       output [3:0] Q, Qbar;
+       output TC;
+       wire [3:0] D;
+       wire [6:0] s;
+       buf #1 (D[0], Qbar[0]);
+       D_FFMaster FF0(D[0], clk, Q[0], Qbar[0]);
+       
+       /*Assume and gates and or gates have 4 ns propagation
+        delay and invert has 1 ns.*/
+       
+           and #4 (s[0], Qbar[3], Qbar[1], Q[0]);
+           and #4 (s[1], Q[1], Qbar[0]);
+           or #4 (D[1], s[0], s[1]);
+           D_FFMaster FF1 (D[1], clk, Q[1], Qbar[1]);
+           
+           and #4 (s[2],Q[2], Qbar[1]);
+           and #4 (s[3],Q[2], Qbar[0]);
+           and #4 (s[4],Q[1], Q[0], Qbar[2]);
+           
+           or #4 (D[2], s[2], s[3], s[4]);
+           D_FFMaster FF2 (D[2], clk, Q[2], Qbar[2]);
+           
+           and #4 (s[5], Q[3], Qbar[0]);
+           and #4 (s[6], Q[0], Q[1], Q[2], Qbar[3]);
+           or #4 (D[3], s[5], s[6]);
+           D_FFMaster FF3 (D[3], clk, Q[3], Qbar[3]);
+           and #4 (TC, Q[0], Qbar[1], Qbar[2], Q[3]);
+       
+       endmodule
+      
+

@@ -1,0 +1,20 @@
+Listing 10.28?Case Statement with Storage
+      
+       module case_str (a, b, ct, d);
+       input [3:0] a, b;
+       input ct;
+       output [4:0] d;
+       reg [4:0] d;
+       always @ (a, b, ct)
+       begin
+           case (ct)
+               1'b0: d = a + b;
+       
+               1'b1: ; /* This is a blank statement with no operation
+                        (null in VHDL)*/
+           endcase
+       
+       end
+       
+       endmodule
+

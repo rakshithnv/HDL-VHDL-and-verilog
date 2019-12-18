@@ -1,0 +1,22 @@
+Listing 10.33?A Verilog Example of Task
+      
+       module example_task (a1, b1, d1);
+       input a1, b1;
+       output d1;
+       reg d1;
+       always @ (a1, b1)
+       begin
+       
+       xor_synth (d1, a1, b1);
+       end
+       
+       task xor_synth;
+       output d;
+       input a, b;
+       begin
+       d = a ^ b;
+       end
+       endtask
+       
+       endmodule
+

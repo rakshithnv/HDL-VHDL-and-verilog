@@ -1,0 +1,54 @@
+Listing 4.15?HDL Description of a D-Latch—VHDL and Verilog
+      
+      VHDL D-Latch Description
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity D_Latch is
+           port (D, E : in std_logic; Q, Qbar : buffer std_logic);
+       end D_Latch;
+       
+       architecture D_latch_str of D_Latch is
+       --Some simulators will not allow mapping between
+       --buffer and out. In this
+       --case, change all out to buffer.
+       
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component nor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : and2 use entity work.bind2 (and2_4);
+       for all : nor2 use entity work.bind2 (nor2_4);
+       for all : inv use entity work.bind1 (inv_1);
+       signal Eb, s1, s2 : std_logic;
+       begin
+           a1 : and2 port map (D, E, s1);
+           a2 : and2 port map (Eb, Q, s2);
+           in1 : inv port map (E, Eb);
+           in2 : inv port map (Qbar, Q);
+           n2 : nor2 port map (s1, s2, Qbar);
+           end D_latch_str;
+      
+      Verilog D-Latch Description
+       module D_latch (D, E, Q, Qbar);
+       input D, E;
+       output Q, Qbar;
+       /* assume 4 ns delay for and gate and nor gate,
+           and 1 ns for inverter */
+       
+       and #4 gate1 (s1, D, E);
+       
+       /* the name "gate1" is optional; we could have
+           written and #4 (s1, D, E) */
+       
+           and #4 gate2 (s2, Eb, Q);
+           not #1 (Eb, E);
+           nor #4 (Qbar, s1, s2);
+           not #1 (Q, Qbar);
+       endmodule
+

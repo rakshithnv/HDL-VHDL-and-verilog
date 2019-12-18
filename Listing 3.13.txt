@@ -1,0 +1,47 @@
+Listing 3.13?HDL Code for Calculating the Factorial of Positive Integers—VHDL and Verilog
+      
+      VHDL: Calculating the Factorial of Positive Integers
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       --The above library statements can be omitted; however no 
+       --error if they are not omitted. The basic VHDL
+       -- has type “natural.” 
+       entity factr is
+       port(N : in natural; z : out natural); 
+       end factr;
+       architecture factorl of factr is
+       begin
+           process (N)
+           variable y, i : natural;
+           begin
+               y := 1;
+               i := 0;
+               while (i < N) loop
+               i := i + 1;
+               y := y * i;
+               end loop;
+               z <= y;
+           end process;
+       end factorl;
+      
+      Verilog: Calculating the Factorial of Positive Integers
+       module factr (N, z);
+       input [5:0] N;
+       output [15:0] z;
+       reg [15:0] z;
+       /* Since z is an output, and it will appear inside “always,” then
+       Z has to be declared “reg” */
+       integer i;
+       always @ (N)
+       begin
+           z = 1;
+       //z can be written as 16’b0000000000000001 or 16’d1.
+           i = 0;
+           while (i < N)
+               begin
+                   i = i + 1;
+                   z = i * z;
+           end
+       end
+       endmodule
+

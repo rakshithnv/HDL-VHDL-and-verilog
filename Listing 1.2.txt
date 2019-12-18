@@ -1,0 +1,12 @@
+Listing 1.2?Example of a Verilog Module
+      
+       module half_adder (I1, I2, O1, O2);
+           input I1;
+           input I2;
+           output O1;
+           output O2;
+           //Blank lines are allowed
+       
+           assign O1 = I1 ^ I2; //statement 1
+           assign O2 = I1 & I2; //statement 2
+      endmodule

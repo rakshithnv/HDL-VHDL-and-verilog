@@ -1,0 +1,86 @@
+Listing 4.22?HDL Description of a 3-Bit Synchronous Even Counter with Hold—VHDL and Verilog
+      
+      VHDL 3-Bit Synchronous Even Counter with Hold
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity CTR_EVEN is
+           port (H, clk : in std_logic;
+               Q, Qbar : buffer std_logic_vector (2 downto 0));
+       end CTR_EVEN;
+       
+       architecture Counter_even of CTR_EVEN is
+       --Some simulators will not allow mapping between
+       --buffer and out. In this
+       --case, change all out to buffer.
+       
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component or2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component or3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component D_FF
+           port (I1, I2 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       
+       
+       for all : D_FF use entity work.bind22 (D_FFMaster);
+       for all : inv use entity work.bind1 (inv_0);
+       for all : and2 use entity work.bind2 (and2_0);
+       for all : and3 use entity work.bind3 (and3_0);
+       for all : or2 use entity work.bind2 (or2_0);
+       for all : or3 use entity work.bind3 (or3_0);
+       signal Hbar, a1, a2, a3, a4, a5, OR11, OR22 : std_logic;
+       begin
+           DFF0 : D_FF port map ('0', clk, Q(0), Qbar(0));
+           inv1 : inv port map (H, Hbar);
+           an1 : and2 port map (Hbar, Qbar(1), a1);
+           an2 : and3 port map (H, Q(1), Qbar(0), a2);
+           r1 : or2 port map (a2, a1, OR11);
+           
+           DFF1 : D_FF port map (OR11, clk, Q(1), Qbar(1));
+           an3 : and3 port map	(Q(2), Qbar(1), Qbar(0), a3);
+           an4 : and3 port map (Qbar(0), H, Q(2), a4);
+           an5 : and3 port map (Hbar, Qbar(2), Q(1), a5);
+           r2 : or3 port map (a3, a4, a5, OR22);
+           
+           DFF2 : D_FF port map (OR22, clk, Q(2), Qbar(2));
+       end Counter_even;
+      
+      Verilog 3-Bit Synchronous Even Counter with Hold
+       module CTR_EVEN (H, clk, Q, Qbar);
+       
+       input H, clk;
+       output [2:0] Q, Qbar;
+           D_FFMaster DFF0 (1'b0, clk, Q[0], Qbar[0]);
+           not (Hbar, H);
+           and (a1, Qbar[1], Hbar);
+           and (a2, H, Q[1], Qbar[0]);
+           or (OR1, a1, a2);
+           
+           D_FFMaster DFF1 (OR1, clk, Q[1], Qbar[1]);
+           
+           and (a3, Q[2], Qbar[1], Qbar[0]);
+           and (a4, Qbar[0], H, Q[2]);
+           and (a5, Hbar, Qbar[2], Q[1]);
+           or (OR2, a3, a4, a5);
+           
+           D_FFMaster DFF2 (OR2, clk, Q[2], Qbar[2]);
+       
+       endmodule
+

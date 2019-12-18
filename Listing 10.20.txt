@@ -1,0 +1,46 @@
+Listing 10.20?Mapping Logical Operators—VHDL and Verilog
+      
+      VHDL: Mapping Logical Operators
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity decod_var is
+           port (a : in std_logic_vector (1 downto 0);
+               D : out std_logic_vector (3 downto 0));
+       end decod_var;
+       
+       architecture Behavioral of decod_var is
+       
+       begin
+       dec : process (a)
+       variable a0bar, a1bar :	std_logic;
+           begin
+               a0bar := not a(0);
+               a1bar := not a(1);
+               D(0) <= not (a0bar and a1bar);
+               D(1) <= not (a0bar and a(1)); 
+               D(2) <= not (a(0) and a1bar);
+               D(3) <= not (a(0) and a(1));
+           end process dec;
+       
+       end Behavioral;
+      
+      Verilog: Mapping Logical Operators
+       module decod_var (a, D);
+       input [1:0] a;
+       output [3:0] D;
+       reg a0bar, a1bar;
+       reg [3:0] D;
+       always @ (a)
+       
+           begin
+               a0bar = ~ a[0];
+               a1bar = ~ a[1];
+               D[0] = ~ (a0bar & a1bar);
+               D[1] = ~ (a0bar & a[1]);
+               D[2] = ~ (a[0] & a1bar);
+               D[3] = ~ (a[0] & a[1]);
+           end
+       
+       endmodule
+

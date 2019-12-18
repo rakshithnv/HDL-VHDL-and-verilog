@@ -1,0 +1,1 @@
+Listing 1.7 and 1.8 are not complete programs and are not included on the CD-ROM. They are pieces of a program to explain a certain statement or construct. If the reader tries to run these listings, the simulator will give an error and will be terminated.

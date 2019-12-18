@@ -1,0 +1,30 @@
+Listing 2.2?HDL Code for Half Adder—VHDL and Verilog
+      
+      VHDL Half Adder Description
+       entity halfadder is
+       port (
+       a : in bit; 
+       b : in bit;
+       s : out bit; 
+       c : out bit); 
+       end halfadder;
+       architecture HA_DtFl of halfadder is
+       begin
+           s <= a xor b; -- This is a signal assignment statement.
+           c <= a and b; -- This is a signal assignment statement.
+       end HA_DtFl;
+      
+      Verilog Half Adder Description
+       module halfadder (a, b, s, c);
+       input a;
+       input b;
+       output s;
+       output c;
+       /*The default type of all inputs and outputs is a single bit. */
+           assign s = a ^ b; /* This is a signal assignment statement;
+                               ^is a bitwise xor logical operator. */
+                   
+           assign c = a & b; /* This is a signal assignment statement
+                             & is a bitwise logical “and” operator */
+       endmodule
+

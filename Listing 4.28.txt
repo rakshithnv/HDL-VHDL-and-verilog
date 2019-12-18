@@ -1,0 +1,221 @@
+Listing 4.28?VHDL Code for All Components Used for Binding in Chapter 4
+      
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity bind1 is
+           port (O1 : out std_logic; I1 : in std_logic);
+       end bind1;
+       architecture inv_0 of bind1 is
+       begin
+           O1 <= not I1;
+       end inv_0;
+       
+       architecture inv_1 of bind1 is
+       begin
+           O1 <= not I1 after 1 ns;
+
+       end inv_1;
+       
+       
+       architecture inv_7 of bind1 is
+       begin
+           O1 <= not I1 after 7 ns;
+       end inv_7;
+       
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity bind2 is
+           port (O1 : out std_logic; I1, I2 : in std_logic);
+       end bind2;
+       
+       architecture xor2_0 of bind2 is
+       begin
+           O1 <= I1 xor I2;
+       end xor2_0;
+       
+       architecture and2_0 of bind2 is
+       begin
+           O1 <= I1 and I2;
+       end and2_0;
+       
+       architecture and2_4 of bind2 is
+       begin
+           O1 <= I1 and I2 after 4 ns;
+       end and2_4;
+       
+       architecture and2_7 of bind2 is
+       begin
+           O1 <= I1 and I2 after 7 ns;
+       end and2_7;
+       
+       architecture or2_0 of bind2 is
+       begin
+           O1 <= I1 or I2;
+       end or2_0;
+       
+       architecture or2_7 of bind2 is
+       begin
+           O1 <= I1 or I2 after 7 ns;
+       end or2_7;
+       
+       architecture nor2_0 of bind2 is
+       begin
+           O1 <= I1 nor I2;
+       end nor2_0;
+
+       
+       architecture nor2_7 of bind2 is
+       begin
+           O1 <= I1 nor I2 after 7 ns;
+       end nor2_7;
+       
+       architecture nor2_4 of bind2 is
+       begin
+           O1 <= I1 nor I2 after 4 ns;
+       end nor2_4;
+       
+       architecture bufif1 of bind2 is
+       begin
+           buf : process (I1, I2)
+           variable tem : std_logic;
+           begin
+       if (I2 ='1')then
+           tem := I1;
+       else
+           tem := 'Z';
+       end if;
+           O1 <= tem;
+           end process buf;
+       end bufif1;
+       
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       
+       entity bind3 is
+           port (O1 : out std_logic; I1, I2, I3 : in std_logic);
+       end bind3;
+       
+       architecture and3_0 of bind3 is
+       begin
+           O1 <= I1 and I2 and I3;
+       end and3_0;
+       
+       architecture and3_7 of bind3 is
+       begin
+           O1 <= I1 and I2 and I3 after 7 ns;
+       end and3_7;
+       
+       architecture or3_0 of bind3 is
+       begin
+           O1 <= I1 or I2 or I3;
+       end or3_0;
+       
+       architecture or3_7 of bind3 is
+       begin
+           O1 <= I1 or I2 or I3 after 7 ns;
+       end or3_7;
+       
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity bind22 is
+           Port (O1, O2 : buffer std_logic; I1, I2 : in std_logic);
+       end bind22;
+       
+       architecture HA of bind22 is
+       --Some simulators will not allow mapping between
+       --buffer and out. In this
+       --case, change all out to buffer.
+       component xor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+           component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+           end component;
+           for A1 : and2 use entity work.bind2 (and2_0);
+           for X1 : xor2 use entity work.bind2 (xor2_0);
+               begin
+               X1 : xor2 port map (I1, I2, O1);
+               A1 : and2 port map (I1, I2, O2);
+           end HA;
+       
+       architecture SR_Latch of bind22 is 
+       component nor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : nor2 use entity work.bind2 (nor2_0);
+       begin
+           n1 : nor2 port map (I1, O1, O2);
+           n2 : nor2 port map (I2, O2, O1);
+       end SR_Latch;
+       
+       architecture D_latch of bind22 is
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component nor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : and2 use entity work.bind2 (and2_4);
+       for all : nor2 use entity work.bind2 (nor2_4);
+       for all : inv use entity work.bind1 (inv_1);
+       signal I2b, s1, s2 : std_logic;
+       begin
+           a1 : and2 port map (I1, I2, s1);
+           a2 : and2 port map (I2b, O1, s2);
+           in1 : inv port map (I2, I2b);
+           in2 : inv port map (O2, O1);
+           n2 : nor2 port map (s1, s2, O2);
+       end D_latch;
+       
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+
+           entity bind32 is
+               port (O1, O2 : out std_logic; I1, I2, I3 : in std_logic);
+           end bind32;
+       
+       architecture full_add of bind32 is
+       component HA
+           port (I1, I2 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       component or2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : HA use entity work.bind22 (HA);
+       for all : or2 use entity work.bind2 (or2_0);
+       signal s0, c0, c1 : std_logic;
+       
+       begin
+           HA1 : HA port map (I2, I3, s0, c0);
+           HA2 : HA port map (I1, s0, O1, c1);
+           r1 : or2 port map (c0, c1, O2);
+       end full_add;
+       
+       
+       architecture JK_FF of bind32 is
+       begin
+       P1 : process (I1, I2, I3)
+       variable temp1, temp2 : std_logic;
+       variable jk : std_logic_vector (1 downto 0);
+       begin
+           if rising_edge (I3) then
+           jk := (I1 & I2);
+               case jk is
+                   when "01" => temp1 := '0';
+                   when "10" => temp1 := '1';
+                   when "11" => temp1 := not temp1;
+                   when "00" => temp1 := temp1;
+                   when others => temp1 :='0';
+               end case;
+       O1 <= temp1;
+       temp2 := not temp1;
+       O2 <= temp2;
+       end if;
+       end process P1;
+       end JK_FF;
+

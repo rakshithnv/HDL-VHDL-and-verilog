@@ -1,0 +1,23 @@
+Listing 10.22 Example of if-else statement. a) VHDL. b) Verilog
+
+     a) VHDL Description
+
+process (a, X, X1)
+begin
+	if  (a = '1') then
+	Y <= X;
+	else
+	Y <= X1;
+	end if;
+end process;
+
+      b) Verilog Description
+
+always @ (a, X, X1)
+begin
+	if (a ==  1'b1)
+	Y = X;
+	else
+	Y = X1;
+end
+

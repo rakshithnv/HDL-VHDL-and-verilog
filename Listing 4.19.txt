@@ -1,0 +1,82 @@
+Listing 4.19?HDL Description of a 3-Bit Comparator Using Adders—VHDL and Verilog
+      
+      VHDL 3-Bit Comparator Using Adders
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity three_bit_cmpare is
+       port (X, Y : in std_logic_vector (2 downto 0);
+           xgty, xlty, xeqy : buffer std_logic);
+       end three_bit_cmpare;
+       
+       architecture cmpare of three_bit_cmpare is
+       
+       --Some simulators will not allow mapping between
+       --buffer and out. In this
+       --case, change all out to buffer.
+       
+       component full_adder
+       
+           port (I1, I2, I3 : in std_logic; O1, O2 : out std_logic);
+       end component;
+       component Inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       component nor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component and3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : full_adder use entity work.bind32 (full_add);
+       for all : Inv use entity work.bind1 (inv_0);
+       for all : nor2 use entity work.bind2 (nor2_0);
+       for all : and3 use entity work.bind3 (and3_7);
+           --To reduce hazards, an AND gate is
+           --implemented with a 7-ns delay.
+       signal sum, Yb : std_logic_vector (2 downto 0);
+       signal carry : std_logic_vector (1 downto 0);
+       begin
+           in1 : inv port map (Y(0), Yb(0));
+           in2 : inv port map (Y(1), Yb(1));
+           in3 : inv port map (Y(2), Yb(2));
+           F0 : full_adder port map (X(0), Yb(0), '0', sum(0), carry(0));
+           F1 : full_adder port map (X(1), Yb(1), carry(0), 
+                                     sum(1), carry(1));
+       
+           F2 : full_adder port map (X(2), Yb(2), carry(1), 
+                                     sum(2), xgty);
+       
+       
+       --The current module could have been linked to the 3-bit adders
+       --designed in Listing 4.18 instead of linking to
+       --F0, F1, and F2, as was done here.
+       
+           a1 : and3 port map (sum(0), sum(1), sum(2), xeqy);
+           n1 : nor2 port map (xeqy, xgty, xlty);
+       end cmpare;
+      
+      Verilog 3-Bit Comparator Using Adders
+       module three_bit_cmpare (X, Y, xgty, xlty, xeqy);
+       input [2:0] X, Y;
+       output xgty, xlty, xeqy;
+       wire [1:0] carry;
+       wire [2:0] sum, Yb;
+           not (Yb[0], Y[0]);
+           not (Yb[1], Y[1]);
+           not (Yb[2], Y[2]);
+           FULL_ADDER M0 (X[0], Yb[0], 1'b0, sum[0], carry[0]);
+           FULL_ADDER M1 (X[1], Yb[1], carry[0], sum[1], carry[1]);
+           FULL_ADDER M2 (X[2], Yb[2], carry[1], sum[2], xgty);
+       
+       /* The current module could have been linked to the
+           3-bit adders designed in Listing 4.18 instead of
+           linking to F0, F1, and F2, as was done here.*/
+       
+           and #7 (xeqy, sum[0], sum[1], sum[2]);	
+       
+       /* To reduce hazard use an AND gate with a delay of 7 units*/
+       
+           nor (xlty, xeqy, xgty);
+       endmodule
+

@@ -1,0 +1,32 @@
+Listing 10.16?VHDL Code for a Signal-Assignment Statement, Y = X—VHDL and Verilog
+      
+      VHDL Signal-Assignment Statement, Y = X
+       library ieee;
+       use ieee.std_logic_1164.all;
+       
+       entity SIGNA_ASSN is
+       port (X : in bit; Y : out bit);
+       end SIGNA_ASSN;
+       
+       architecture BEHAVIOR of SIGNA_ASSN is
+       begin
+       
+           P1 : process (X)
+           begin
+               Y <= X;
+           end process P1;
+       
+       
+       end BEHAVIOR;
+     
+      Verilog Signal-Assignment Statement, Y = X
+       module SIGNA_ASSN (X, Y);
+       input X;
+       output Y;
+       reg y;
+       always @ (X)
+           begin
+           Y = X;
+           end
+       endmodule
+

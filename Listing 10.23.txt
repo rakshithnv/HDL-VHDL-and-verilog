@@ -1,0 +1,40 @@
+Listing 10.23?Example of Comparison Using If-else Statement—VHDL and Verilog 
+      
+      VHDL If-Else Statement
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity IF_st is
+           port (a : in std_logic_vector (2 downto 0); Y : out Boolean);
+       end IF_st;
+       
+       architecture IF_st of IF_st is
+       begin
+       
+       IfB : process (a)
+       variable tem : Boolean;
+       begin
+           if (a < "101") then
+           tem := true;
+           else
+           tem := false;
+           end if;
+       Y <= tem;
+       end process;
+       end IF_st; 
+      
+      
+      Verilog If-Else Statement
+       module IF_st (a, Y);
+       input [2:0] a;
+       output Y;
+       reg Y;
+       always @ (a)
+       begin
+       if (a < 3'b101)
+       Y = 1'b1;
+       else
+       Y = 1'b0;
+       end
+       endmodule
+

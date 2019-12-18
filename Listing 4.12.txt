@@ -1,0 +1,24 @@
+Listing 4.12?VHDL Code for the Half Adder
+      
+       --This code is to be appended to Listing 4.8
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity bind22 is
+           Port (I1, I2 : in std_logic; O1, O2 : out std_logic);
+       end bind22;
+       
+       architecture HA of bind22 is
+       component xor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       for A1 : and2 use entity work.bind2 (and2_0);
+       for X1 : xor2 use entity work.bind2 (xor2_0);
+       begin
+           X1 : xor2 port map (I1, I2, O1);
+           A1 : and2 port map (I1, I2, O2);
+       end HA;
+

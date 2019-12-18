@@ -1,0 +1,21 @@
+Listing 3.4?VHDL Code for Behavioral Description of D-Latch Using Variable-Assignment Statements
+      
+       entity DLTCH_var is
+           port (d, E : in bit; Q, Qb : out bit);
+       -- Since we are using type bit, no need for attaching a Library.
+       -- If we use std_logic, we should attach the IEEE Library.
+       end DLTCH_var;
+       architecture DLCH_VAR of DLTCH_var is
+       begin
+       VAR : process (d, E)
+       variable temp1, temp2 : bit;
+       begin
+           if E = '1' then
+           temp1 := d;         -- Variable assignment statement.
+           temp2 := not temp1; -- Variable assignment statement.
+       end if;
+       Qb <= temp2; -- Value of temp2 is passed to Qb
+       Q <= temp1;  -- Value of temp1 is passed to Q
+       end process VAR;
+       end DLCH_VAR;
+

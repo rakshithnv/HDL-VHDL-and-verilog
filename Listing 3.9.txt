@@ -1,0 +1,90 @@
+Listing 3.9?HDL Code for Genotypes and Phenotypes Using the Case Statement—VHDL and Verilog
+      
+This program takes the blood genotypes (alleles) of a male and a female, and generates the possible blood phenotypes of their offspring. The statement report (VHDL) or display (Verilog) is used to print the phenotype on the screen of the simulator. The male allele is allelm, and allelf is the female allele. Both allelm and allelf are 00 for genotype A, 01 for B, or 10 for O. Phenotype A is decoded as 000, B as 001, AB as 010, O as 011, and an illegal allele entry as 111.
+      
+      VHDL Genotypes and Phenotypes Using Case
+       library ieee;
+       use ieee.std_logic_1164.all;
+       entity Bld_type is
+           port (allelm, allelf : in bit_vector (1 downto 0);
+               pheno : out bit_vector (2 downto 0));
+       end Bld_type;
+       architecture GEN_BLOOD of Bld_type is
+       begin
+       Bld : process (allelm, allelf)
+       variable geno : bit_vector(3 downto 0);
+       begin
+           geno := allelm & allelf;
+       
+           -- The operator (&) concatenates the two 2-bit vectors allelf
+           -- and allelm into one 4-bit vector geno.
+       
+           case geno is
+               when "0000" => pheno <= "000";
+               report "phenotype is A ";
+       
+           -- report statement is close to printf in C language. 
+           --The statement prints on the screen whatever
+           -- written between the quotations.
+       
+               when "0001" => pheno <= "010";
+               report "phenotype is AB ";
+               when "0010" => pheno <= "000";
+               report "phenotype is A ";
+               when "0100" => pheno <= "010";
+               report "phenotype is AB ";
+               when ("0101") => pheno <= "001";
+               report "phenotype is B ";
+               when ("0110") => pheno <= "001";
+               report "phenotype is B ";
+               when "1000" => pheno <= "000";
+               report "phenotype is A ";
+               when ("1001") => pheno <= "001";
+               report "phenotype is B ";
+               when "1010" => pheno <= "011";
+               report "phenotype is O ";
+               when others =>pheno <= "111";
+               report "illegal allele entry ";
+           end case;
+       end process;
+       end GEN_BLOOD;
+      
+      Verilog Genotypes and Phenotypes Using Case
+       module bld_type (allelm, allelf, pheno);
+       input [1:0] allelm, allelf;
+       output [2:0] pheno;
+       reg [2:0] pheno;
+       reg [3:0] geno;
+       always @ (allelm, allelf)
+       begin
+       geno = {allelm , allelf};
+       
+       /* { , } concatenates the two 2-bit vectors allelm and allelf 
+       into one 4-bit vector geno */
+       
+       case (geno)
+       4'd0 : begin pheno = 3'd0;
+       $display ("phenotype is A "); end
+       4'd1 : begin pheno = 3'd2;
+       $display ("phenotype is AB "); end
+       4'd2 : begin pheno = 3'd0;
+       $display ("phenotype is A "); end
+       4'd4 : begin pheno = 3'd2;
+       $display ("phenotype is AB "); end
+       4'd5 : begin pheno = 3'd1;
+       $display ("phenotype is B "); end
+       4'd6 : begin pheno = 3'd1;
+       $display ("phenotype is B "); end
+       4'd8 : begin pheno = 3'd0;
+       $display ("phenotype is A "); end
+       4'd9 : begin pheno = 3'd1;
+       $display ("phenotype is B "); end
+       4'd10 : begin pheno = 3'd3;
+       $display ("phenotype is O "); end
+       default: begin pheno = 3'd7;
+       $display ("illegal allele entry "); end
+           endcase
+       end
+       
+       endmodule
+

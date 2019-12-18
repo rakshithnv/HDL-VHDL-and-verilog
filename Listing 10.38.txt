@@ -1,0 +1,22 @@
+Listing 10.38?Code for Exercise 10.2
+      
+       module elseif2 (inp, outp);
+       input [3:0] inp;
+       output [2:0] outp;
+       reg [2:0] outp;
+       always @ (inp)
+       begin
+       
+           if (inp[0] == 1'b1)
+           outp = 3'd7;
+           else if (inp[1] == 1'b1)
+           outp = 3'd6;
+           else if (inp[2] == 1'b1)
+           outp = 3'd5;
+           else
+           outp = 3'd0;
+       end
+       
+       
+       endmodule
+

@@ -1,0 +1,35 @@
+Listing 4.1?HDL Structural Description—VHDL and Verilog
+      
+      VHDL Structural Description	
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+           entity system is
+           port (a, b : in std_logic; 
+       sum, cout : out std_logic);
+           end system;
+           architecture struct_exple of system is 
+           --start declaring all different types of components
+           component xor2
+               port (I1, I2 : in std_logic;
+               O1 : out std_logic);
+           end component;
+           component and2
+               port (I1, I2 : in std_logic;
+               O1 : out std_logic);
+           end component;
+               begin
+           --Start of instantiation statements
+           X1 : xor2 port map (a, b, sum);
+           A1 : and2 port map (a, b, cout);
+           end struct_exple;
+      
+      Verilog Structural Description
+       module system (a, b, sum, cout);
+       input a, b;
+       output sum, cout;
+       xor X1 (sum, a, b);
+       /* X1 is an optional identifier; it can be omitted.*/
+       and a1 (cout, a, b);
+       /* a1 is optional identifier; it can be omitted.*/
+       endmodule
+

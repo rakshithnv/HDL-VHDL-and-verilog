@@ -1,0 +1,20 @@
+Listing 10.29?Verilog Casex
+       
+       module Encoder_4 (IR, RA);
+       input [3:0] IR;
+       output [3:0] RA;
+       
+           reg [3:0] RA;
+           always @ (IR)
+               begin
+                   casex (IR)
+                       4'bxxx1 : RA = 4'd1;
+                       4'bxx10 : RA = 4'd2;
+                       4'bx100 : RA = 4'd4;
+                       4'b1000 : RA = 4'd8;
+                       default : RA = 4'd0;
+       
+                   endcase
+               end
+           endmodule
+

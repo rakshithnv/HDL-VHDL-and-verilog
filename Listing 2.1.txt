@@ -1,0 +1,27 @@
+Listing 2.1?Example of HDL Data-Flow Description—VHDL and Verilog
+      
+      VHDL Description
+       entity system is
+           port (I1, I2 : in bit; O1, O2 : out bit);
+       end;
+       architecture dtfl_ex of system is
+       begin
+           O1 <= I1 and I2; -- statement 1.
+           O2 <= I1 xor I2; -- statement 2.
+       
+       --Statements 1 and 2 are signal-assignment statements
+       
+       end dtfl_ex;
+      
+      Verilog Description
+       module system (I1, I2, O1, O2);
+           input I1, I2;
+           output O1, O2;
+       
+/*by default all the above inputs and outputs are 1-bit signals.*/
+       
+           assign O1 = I1&I2; // statement 1
+           assign O2 = I1^I2; // statement 2
+/*Statements 1 and 2 are continuous signal-assignment statements*/
+       endmodule
+

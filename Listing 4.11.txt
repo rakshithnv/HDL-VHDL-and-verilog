@@ -1,0 +1,59 @@
+Listing 4.11?HDL Description of a 2x4 Decoder with Tri-State Output—VHDL and Verilog
+      
+      VHDL 2x4 Decoder with Tri-State Output
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity decoder2x4 is
+           port (I : in std_logic_vector(1 downto 0); Enable : in
+                 std_logic; D : out std_logic_vector (3 downto 0));
+       
+       end decoder2x4;
+       
+       architecture decoder of decoder2x4 is
+       component bufif1
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : bufif1 use entity work.bind2 (bufif1);
+       for all : inv use entity work.bind1 (inv_0);
+       for all : and2 use entity work.bind2 (and2_0);
+       signal s0, s1, s2, s3 : std_logic;
+       signal Ibar : std_logic_vector (1 downto 0);
+       -- The above signals have to be declared before they can be used
+       begin
+           B0 : bufif1 port map (s0, Enable, D(0));
+           B1 : bufif1 port map (s1, Enable, D(1));
+           B2 : bufif1 port map (s2, Enable, D(2));
+           B3 : bufif1 port map (s3, Enable, D(3));
+           iv0 : inv port map (I(0), Ibar(0));
+           iv1 : inv port map (I(1), Ibar(1));
+           a0 : and2 port map (Ibar(0), Ibar(1), s0);
+           a1 : and2 port map (I(0), Ibar(1), s1);
+           a2 : and2 port map (Ibar(0), I(1), s2);
+           a3 : and2 port map (I(0), I(1), s3);
+       end decoder;
+      
+      Verilog 2x4 Decoder with Tri-State Output
+       module decoder2x4 (I, Enable, D);
+       input [1:0] I;
+       input Enable;
+       output [3:0] D;
+       wire [1:0] Ibar;
+           bufif1 (D[0], s0, Enable);
+           bufif1 (D[1], s1, Enable);
+           bufif1 (D[2], s2, Enable);
+           bufif1 (D[3], s3, Enable);
+           not (Ibar[0], I[0]);
+           not (Ibar[1], I[1]);
+           and (s0, Ibar[0], Ibar[1]);
+           and (s1, I[0], Ibar[1]);
+           and (s2, Ibar[0], I[1]);
+           and (s3, I[0], I[1]);
+       endmodule
+

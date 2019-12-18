@@ -1,0 +1,86 @@
+Listing 4.25?HDL Description of N-Bit Magnitude Comparator Using Generate Statement—VHDL and Verilog
+      
+      VHDL N-Bit Magnitude Comparator Using Generate Statement
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       
+       entity compr_genr is
+       generic (N : integer := 3);
+       
+           port (X, Y : in std_logic_vector (N downto 0);
+               xgty, xlty, xeqy : buffer std_logic);
+       end compr_genr;
+       
+       architecture cmpare_str of compr_genr is
+       --Some simulators will not allow mapping between
+       --buffer and out. In this
+       --case, change all out to buffer.
+       
+       component full_adder
+           port (I1, I2, I3 : in std_logic; O1, O2 : out std_logic);
+       end component;
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       component nor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       signal sum, Yb : std_logic_vector (N downto 0);
+       signal carry, eq : std_logic_vector (N + 1 downto 0);
+       
+       for all : full_adder use entity work.bind32 (full_add);
+       for all : inv use entity work.bind1 (inv_0);
+       for all : nor2 use entity work.bind2 (nor2_7);
+       for all : and2 use entity work.bind2 (and2_7);
+       begin
+           carry(0) <= '0';
+           eq(0) <= '1';
+       G1 : for i in 0 to N generate
+           v1 : inv port map (Y(i), Yb(i));
+           FA : full_adder port map (X(i), Yb(i), carry(i),
+               sum(i), carry(i+1));
+           a1 : and2 port map (eq(i), sum(i), eq(i+1));
+       
+           end generate G1;
+           xgty <= carry(N+1);
+           xeqy <= eq(N+1);
+           n1 : nor2 port map (xeqy, xgty, xlty);
+       
+       end cmpare_str;
+      
+      Verilog N-Bit Magnitude Comparator Using Generate Statement
+       module compr_genr (X, Y, xgty, xlty, xeqy);
+       parameter N = 3;
+       input [N:0] X, Y;
+       output xgty, xlty, xeqy;
+       wire [N:0] sum, Yb;
+       wire [N+1 : 0] carry, eq;
+           assign carry[0] = 1'b0;
+           assign eq[0] = 1'b1;
+       
+           generate
+       
+       genvar i;
+           for (i = 0; i <= N; i = i + 1)
+               begin : u
+               not (Yb[i], Y[i]);
+       
+       /* The above statement is equivalent to assign Yb = ~Y if
+          outside the generate loop */
+       
+       
+               FULL_ADDER FA(X[i], Yb[i], carry [i], sum [i], 
+                               carry[i+1]);
+               and (eq[i+1], sum[i], eq[i]);
+           end
+           endgenerate
+       assign xgty = carry[N+1];
+       assign xeqy = eq[N+1];
+       nor (xlty, xeqy, xgty);
+       
+       endmodule
+

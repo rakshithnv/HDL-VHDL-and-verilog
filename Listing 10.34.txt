@@ -1,0 +1,48 @@
+Listing 10.34?An Example of a Procedure
+      
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity Int_Bin is
+       generic (N : integer := 3);
+       port (X_bin : out std_logic_vector (N downto 0); 
+             Y_int : in integer;
+           flag_even : out std_logic);
+       end Int_Bin;
+       
+       architecture convert of Int_Bin is
+       
+       procedure itb (bin : out std_logic_vector; 
+                      signal flag : out std_logic;
+                      N : in integer; int : inout integer) is
+       
+       begin
+       if (int MOD 2 = 0) then
+           flag <= '1';
+           else
+           flag <= '0';
+       end if;
+       for i in 0 to N loop
+       
+           if (int MOD 2 = 1) then	
+           bin (i) := '1';			
+           else
+           bin (i) := '0';		
+           end if;					
+       
+           int := int / 2;				
+       end loop;
+       end itb;
+       
+       begin
+       process (Y_int)
+       variable tem : std_logic_vector (N downto 0);
+       variable tem_int : integer;
+       
+       begin
+           tem_int := Y_int;
+           itb (tem, flag_even, N, tem_int);
+           X_bin <= tem;
+       end process;
+       end convert;
+

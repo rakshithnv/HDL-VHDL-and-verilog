@@ -1,0 +1,35 @@
+Listing 1.4? Pure Structural Description—VHDL and Verilog
+      
+      VHDL Structural Description
+       entity system is
+       
+           port (a, b : in bit;
+           sum, cout : out bit);
+       end system;
+       
+       architecture struct_exple of system is
+       
+       component xor2 
+       --The above statement is a component statement
+           port(I1, I2 : in bit;
+           O1 : out bit);
+       end component;
+       component and2
+           port(I1, I2 : in bit;
+           O1 : out bit);
+       end component;
+           begin
+               X1 : xor2 port map (a, b, sum); 
+               A1 : and2 port map (a, b, cout);
+           end struct_exple;
+      
+      Verilog Structural Description
+       module system(a, b, sum, cout);
+       input a, b;
+       output sum, cout;
+           xor X1(sum, a, b);
+       //The above statement is EXCLUSIVE-OR gate
+           and a1(cout, a, b);
+       //The above statement is AND gate
+       endmodule
+

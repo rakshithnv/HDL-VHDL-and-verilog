@@ -1,0 +1,33 @@
+Listing 2.6?HDL Code of a 2x2 Magnitude Comparator—VHDL and Verilog
+
+      VHDL 2x2 Magnitude Comparator Description
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity COMPR_2 is
+       port (x, y : in std_logic_vector(1 downto 0); xgty,
+           xlty : buffer std_logic; xeqy : out std_logic);
+       end COMPR_2;							    
+       
+       architecture COMPR_DFL of COMPR_2 is
+       begin
+       xgty <= (x(1) and not y(1)) or (x(0) and not y(1) and 
+                  not y(0)) or
+           x(0) and x(1) and not y(0));
+       xlty <= (y(1) and not x(1)) or ( not x(0) and y(0)
+                  and y(1)) or
+           (not x(0) and not x(1) and y(0));
+       xeqy <= xgty nor xlty;
+       end COMPR_DFL;
+      
+      Verilog 2x2 Magnitude Comparator Description
+       module compr_2 (x, y, xgty, xlty, xeqy);
+       input [1:0] x, y;
+       output xgty, xlty, xeqy;
+       assign xgty = (x[1] & ~ y[1]) | (x[0] & ~ y[1] 
+                      & ~ y[0]) | (x[0] &  x[1] & ~ y[0]);
+       assign xlty = (y[1] & ~ x[1] ) | (~ x[0] & y[0] & y[1]) |
+                     (~ x[0] & ~ x[1] & y[0]);
+       assign xeqy = ~ (xgty | xlty);
+       endmodule
+

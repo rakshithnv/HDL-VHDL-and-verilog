@@ -1,0 +1,54 @@
+Listing 4.9?HDL Description of a 2x1 Multiplexer with Active Low Enable—VHDL and Verilog
+      
+      VHDL 2x1 Multiplexer with Active Low Enable
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity mux2x1 is
+           port (A, B, SEL, Gbar : in std_logic;
+               Y : out std_logic);
+           end mux2x1;
+       
+       architecture mux_str of mux2x1 is
+       
+           --Start Components Declaration
+           component and3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       --Only different types of components need be declared.
+       --Since the multiplexer has two identical AND gates,
+       --only one is declared.
+       
+       component or2
+       port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component Inv
+       port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       signal S1, S2, S3, S4, S5 : std_logic;
+       for all : and3 use entity work.bind3 (and3_7);
+       for all : Inv use entity work.bind1 (inv_7);
+       for Or1 : or2 use entity work.bind2 (or2_7);
+       begin
+           --Start instantiation
+       A1 : and3 port map (A,S2, S1, S4);
+       A2 : and3 port map (B,S3, S1, S5);
+       IV1 : Inv port map (SEL, S2);
+       IV2 : Inv port map (Gbar, S1);
+       IV3 : Inv port map (S2, S3);
+       or1 : or2 port map (S4, S5, Y);
+       end mux_str;
+      
+      Verilog 2x1 Multiplexer with Active Low Enable
+       module mux2x1 (A, B, SEL, Gbar, Y);
+       input A, B, SEL, Gbar;
+       output Y;
+       and #7 (S4, A, S2, S1);
+       or #7 (Y, S4, S5);
+       and #7 (S5, B, S3, S1);
+       not #7 (S2, SEL);
+       not #7 (S3, S2);
+       not #7 (S1, Gbar);
+       endmodule
+

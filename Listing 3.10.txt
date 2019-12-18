@@ -1,0 +1,20 @@
+Listing 3.10?Verilog Description for a 4-Bit Priority Encoder
+      
+       module Encoder_4 (Int_req, Rout_addrs);
+       input [3:0] Int_req;
+       output [3:0] Rout_addrs;
+           reg [3:0] Rout_addrs;
+       
+       always @ (Int_req)
+                   begin
+                       casex (Int_req)
+                           4'bxxx1 : Rout_addrs=4'd1; 
+                           4'bxx10 : Rout_addrs=4'd2;
+                           4'bx100 : Rout_addrs=4'd4;
+                           4'b1000 : Rout_addrs= 4'd8;
+                           default : Rout_addrs=4'd0;
+       
+                       endcase
+                   end
+       endmodule
+

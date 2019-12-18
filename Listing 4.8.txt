@@ -1,0 +1,84 @@
+Listing 4.8?VHDL Code for Several Gates
+      
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity bind1 is
+       port (I1 : in std_logic; O1 : out std_logic);
+       end bind1;
+       architecture inv_0 of bind1 is
+       begin
+       O1 <= not I1; --This is an inverter with zero delay
+       end inv_0;
+       
+       architecture inv_7 of bind1 is
+       begin
+       O1 <= not I1 after 7 ns; --This is an inverter with a 7-ns delay
+       end inv_7;
+       
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity bind2 is
+       port (I1, I2 : in std_logic; O1 : out std_logic);
+       end bind2;
+       
+       architecture xor2_0 of bind2 is
+       begin
+       O1 <= I1 xor I2; --This is exclusive-or with zero delay.
+       end xor2_0;
+       
+       architecture and2_0 of bind2 is
+       begin
+       O1 <= I1 and I2; --This is a two input and gate with zero delay.
+       end and2_0;
+       
+       architecture and2_7 of bind2 is
+       begin
+       O1 <= I1 and I2 after 7 ns; -- This is a two input and gate
+                                   -- with 7-ns delay.
+       end and2_7;
+       
+       architecture or2_0 of bind2 is
+       begin
+       O1 <= I1 or I2; -- This is a two input or gate with zero delay.
+       end or2_0;
+       
+       architecture or2_7 of bind2 is
+       begin
+       O1 <= I1 or I2 after 7 ns; -- This is a two input or gate
+                                  -- with 7-ns delay.
+       end or2_7;
+       
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity bind3 is
+       port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end bind3;
+       
+       architecture and3_0 of bind3 is
+       begin
+       O1 <= I1 and I2 and I3; -- This is a three input and gate
+                               -- with zero delay.
+       end and3_0;
+       
+       architecture and3_7 of bind3 is
+       begin
+       O1 <= I1 and I2 and I3 after 7 ns; --This is a three input
+                                          --and gate with 7-ns
+                                          --delay.
+       end and3_7;
+       
+       architecture or3_0 of bind3 is
+       begin
+       O1 <= I1 or I2 or I3; --This is a three input or gate
+                             --with zero delay.
+       end or3_0;
+       
+       architecture or3_7 of bind3 is
+       begin
+       O1 <= I1 or I2 or I3 after 7 ns; --This is a three input or gate
+                                        --with 7-ns delay.
+       end or3_7;
+

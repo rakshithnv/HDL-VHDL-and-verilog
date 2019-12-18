@@ -1,0 +1,48 @@
+Listing 4.2?HDL Code of Half Adder—VHDL and Verilog
+      
+      VHDL Half Adder Description
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity xor2 is
+       port(I1, I2 : in std_logic; O1 : out std_logic);
+       end xor2;
+       architecture Xor2_0 of xor2 is
+           begin
+           O1 <= I1 xor I2;
+       end Xor2_0;
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity and2 is
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end and2;
+       architecture and2_0 of and2 is
+           begin
+           O1 <= I1 and I2;
+       end and2_0;
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity half_add is
+           port (a, b : in std_logic; S, C : out std_logic);
+       end half_add;
+       
+       architecture HA_str of half_add is
+           component xor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       begin
+       X1 : xor2 port map (a, b, S);
+       A1 : and2 port map (a, b, C);
+       end HA_str;
+      
+      Verilog Half Adder Description
+       module half_add (a, b, S, C);
+       input a, b;
+       output S, C;
+       xor (S, a, b);
+       and (C, a, b);
+       endmodule
+

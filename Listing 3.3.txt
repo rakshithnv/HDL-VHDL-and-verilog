@@ -1,0 +1,46 @@
+Listing 3.3?HDL Description of a 2x1 Multiplexer Using ELSE-IF—VHDL and Verilog
+      
+      VHDL 2x1 Multiplexer Using ELSE-IF
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity MUXBH is
+           port (A, B, SEL, Gbar : in std_logic; 
+       Y : out std_logic);
+       end MUXBH;
+       architecture MUX_bh of MUXBH is
+       begin
+       process (SEL, A, B, Gbar) 
+       variable temp : std_logic; 
+           begin
+               if (Gbar = '0') and (SEL = '1') then
+               temp := B;
+               elsif (Gbar = '0') and (SEL = '0')then 
+               temp := A; 
+               else
+               temp := 'Z'; -- Z is high impedance.
+           end if;
+       Y <= temp;
+       end process;
+       end MUX_bh;
+      
+      Verilog 2x1 Multiplexer Using ELSE-IF
+       module MUXBH (A, B, SEL, Gbar, Y);
+       input A, B, SEL, Gbar;
+       output Y;
+       reg Y; /* since Y is an output and appears inside always,
+               Y has to be declared as reg( register) */
+              
+       always @ (SEL, A, B, Gbar)
+       begin
+           if (Gbar == 0 & SEL == 1)
+           begin
+               Y = B;
+           end
+           else if (Gbar == 0 & SEL == 0)
+           Y = A;
+           else
+           Y = 1'bz; //Y is assigned to high impedance
+       end
+       
+       endmodule
+

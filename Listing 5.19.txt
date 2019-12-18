@@ -1,0 +1,57 @@
+Listing 5.19?HDL Code for a D-Latch Using CMOS Switches—VHDL and Verilog
+      
+      VHDL D-Latch Using CMOS Switches
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity D_Latch is
+       port (D, E : in std_logic; Q, Qbar : inout std_logic);
+       -- Referring to Figure 5.22, signal Q is
+       --input and output and has multiple
+       --sources (the inverter and the CMOS switches,
+       --so Q has to be declared as
+       --inout. All other ports are also adjusted in
+       --the following components to be inout.
+       
+       end D_Latch;
+       
+       architecture DlatchCmos of D_Latch is
+       component CMOS
+       port (output : out std_logic; input, gn, gp : in std_logic);
+       end component;
+       component invert
+       Port (y : out std_logic; a : in std_logic );
+       end component;
+       for all : CMOS use entity work.CMOS (macro); 
+       for all : invert use entity work.inverter( Invert_switch);
+       signal Ebar, s1 : std_logic;
+       begin
+       c1 : cmos port map (Q, D, E, Ebar);
+       c2 : cmos port map (Q, s1, Ebar, E);
+       inv1 : invert port map (Ebar, E);
+       inv2 : invert port map (Qbar, Q);
+       inv3 : invert port map (s1, Qbar);
+       
+       end DlatchCmos;
+      
+      Verilog D-Latch Using CMOS Switches
+       module D_latch (D, E, Q, Qbar);
+       input D, E;
+       output Q, Qbar;
+       cmos (Q, D, E, Ebar);
+       cmos (Q, s1, Ebar, E);
+       invert inv1 (Ebar, E);
+       invert inv2 (Qbar, Q);
+       invert inv3 (s1, Qbar);
+       
+       endmodule
+       
+       module invert (y, a);
+       input a;
+       output y;
+       supply1 vdd;
+       supply0 gnd;
+       pmos p1 (y, vdd, a);
+       nmos n1 (y, gnd, a);
+       endmodule
+

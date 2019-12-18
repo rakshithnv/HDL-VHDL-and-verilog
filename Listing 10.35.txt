@@ -1,0 +1,24 @@
+Listing 10.35?Verilog Example of a Function
+       
+       module Func_synth (a1, b1, d1);
+       input a1, b1;
+       output d1;
+       reg d1;
+       
+       always @ (a1, b1)
+       begin
+       
+       
+       d1 = andopr (a1, b1);
+       end
+       
+       function andopr;
+       input a, b;
+       begin
+       
+       andopr = a ^ b;
+       end
+       endfunction
+       
+       endmodule
+

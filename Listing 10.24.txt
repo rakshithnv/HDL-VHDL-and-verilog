@@ -1,0 +1,46 @@
+Listing 10.24?Example of Elseif and Else-If—VHDL and Verilog
+      
+      VHDL Elseif Description
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       use IEEE.STD_LOGIC_ARITH.ALL;
+       
+       entity elseif is
+       port (BP : in natural range 0 to 7; 
+             ADH : out natural range 0 to 15);
+           end;
+       
+       architecture elseif of elseif is
+           begin
+       
+           ADHP : process(BP)
+               variable resADH : natural := 0;
+               begin
+       
+                   if BP <= 2 then resADH := 15;
+                   elsif BP >= 5 then resADH := 0;
+                   else
+                   resADH := BP * (-5) + 25;
+                   end if;
+       
+           ADH <= resADH;
+           end process ADHP;
+           end elseif;
+      
+      Verilog Else-If Description
+       module elseif (BP, ADH);
+       input [2:0] BP;
+       output [3:0] ADH;
+       reg [3:0] ADH;
+       always @ (BP)
+       begin
+       
+           if (BP <= 2) ADH = 15;
+               else if (BP >= 5) ADH = 0;
+               else
+               ADH = BP * (-5) + 25;
+            end
+       
+       
+       endmodule
+

@@ -1,0 +1,25 @@
+Listing 10.36?Example of Function Synthesis
+       
+       module Function_Synth2 (x, y);
+       
+       input [2:0] x;
+       output [3:0] y;
+       reg [3:0] y;
+       
+       always @ (x)
+       begin
+       y = fn (x);
+       end
+       
+       function [3:0] fn;
+       input [2:0] a;
+       begin
+       
+       if (a <= 4)
+       
+       fn = 2 * a + 5;
+       end
+       endfunction
+       
+       endmodule
+

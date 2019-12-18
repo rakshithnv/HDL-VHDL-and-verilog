@@ -1,0 +1,19 @@
+Listing 4.7?Binding Between Two Modules in Verilog
+      
+       module one (O1, O2, a, b);
+           input [1:0] a;
+           input [1:0] b;
+           output [1:0] O1, O2;
+       
+       two M0 (O1[0], O2[0], a[0], b[0]);
+       two M1 (O1[1], O2[1], a[1], b[1]);
+       endmodule
+       
+       module two (s1, s2, a1, b1);
+           input a1;
+           input b1;
+           output s1, s2;
+       xor (s1, a1, b1);
+       and (s2, a1, b1);
+       endmodule
+

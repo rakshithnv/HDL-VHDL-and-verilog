@@ -1,0 +1,47 @@
+Listing 4.6?Binding Between a Library and Component in VHDL
+      
+       --First, write the code that will be bound to another module
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity bind2 is
+       port (I1, I2 : in std_logic; O1 : out std_logic);
+       end bind2;
+       
+       architecture xor2_0 of bind2 is
+       begin
+           O1 <= I1 xor I2;
+       end xor2_0;
+       
+       architecture and2_0 of bind2 is
+       begin
+           O1 <= I1 and I2;
+       end and2_0;
+       
+       architecture and2_4 of bind2 is
+       begin
+           O1 <= I1 and I2 after 4 ns;
+       end and2_4;
+       
+       --After writing the above code; compile it and store it in a 
+       -- known location. Now, open another module
+       --where the above information is to be used.
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+           entity half_add is
+           port (a, b : in std_logic; S, C : out std_logic);
+           end half_add;
+       
+           architecture HA_str of half_add is
+           component xor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+           end component;
+           component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+           end component;
+           for all : xor2 use entity work.bind2 (xor2_0);
+           for all : and2 use entity work.bind2 (and2_4);
+           begin
+           X1 : xor2 port map (a, b, S);
+           A1 : and2 port map (a, b, C);
+           end HA_str;
+

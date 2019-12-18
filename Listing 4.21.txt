@@ -1,0 +1,78 @@
+Listing 4.21?HDL Description of a 3-Bit Synchronous Counter Using JK Master-Slave Flip-Flops—VHDL and Verilog
+      
+      ***Begin Listing***
+      VHDL 3-Bit Synchronous Counter Using JK Master-Slave Flip-Flops
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity countr_3 is
+           port(clk, clrbar : in std_logic; 
+                 q, qb : buffer std_logic_vector(2 downto 0));
+       end countr_3;
+       
+       architecture CNTR3 of countr_3 is
+       --Start component declaration statements
+       
+       --Some simulators will not allow mapping between
+       --buffer and out. In this
+       --case, change all out to buffer.
+       
+       component JK_FF
+           port (I1, I2, I3 : in std_logic; O1, O2 : buffer std_logic);
+        end component;
+       
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component or2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       for all : JK_FF use entity work.bind32 (JK_Master);
+       for all : inv use entity work.bind1 (inv_0);
+       for all : and2 use entity work.bind2 (and2_0);
+       for all : or2 use entity work.bind2 (or2_0);
+       signal J1, K1, J2, K2, clr, clrb1, s1 : std_logic;
+       begin
+           FF0 : JK_FF port map (clrb1, '1', clk, q(0), qb(0));
+           -- clrb1 has the same logic as clrbar
+       
+           A1 : and2 port map (clrb1, q(0), J1);
+           inv1 : inv port map (clr, clrb1);
+           inv2 : inv port map (clrbar, clr);
+           
+           r1 : or2 port map (q(0), clr, K1);
+           FF1 : JK_FF port map (J1, K1, clk, q(1), qb(1));
+           A2 : and2 port map (q(0), q(1), s1);
+           A3 : and2 port map (clrb1, s1, J2);
+           r2 : or2 port map (s1, clr, K2);
+           FF2 : JK_FF port map (J2, K2, clk, q(2), qb(2));
+       end CNTR3;
+      
+      Verilog 3-Bit Synchronous Counter Using JK Master-Slave Flip-Flops
+       module countr_3 (clk, clrbar, q, qb);
+       input clk, clrbar;
+       output [2:0] q, qb;
+           
+           JK_FF FF0(clrb1, 1'b1, clk, q[0], qb[0]);
+       // clrb1 has the same logic as clrbar
+           and A1 (J1, q[0], clrb1);
+           
+       /*The name of the and gate “A1” and all other
+        gates in this code are optional; it can be omitted.*/
+           
+           not inv1 (clrb1, clr);
+           not inv2 (clr, clrbar);
+           
+           or r1 (K1, q[0], clr);
+           JK_FF FF1 (J1, K1, clk, q[1], qb[1]);
+           and A2 (s1, q[0], q[1]);
+           and A3 (J2, clrb1, s1);
+           or or2 (K2, s1, clr);
+           JK_FF FF2(J2, K2, clk, q[2], qb[2]);
+       endmodule
+

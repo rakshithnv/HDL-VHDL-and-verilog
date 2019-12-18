@@ -1,0 +1,21 @@
+Listing 4.10?VHDL Behavioral Description of a Tri-State Buffer
+      
+       entity bind2 is
+       port (I1, I2 : in std_logic; O1 : out std_logic);
+       end bind2;
+       --Add the following architecture to
+       --the entity bind2 of Listing 4.8
+       architecture bufif1 of bind2 is
+       begin
+       buf : process (I1, I2)
+       variable tem : std_logic;
+       begin
+       if (I2 ='1') then
+       tem := I1;
+       else
+       tem := 'Z';
+       end if;
+       O1 <= tem;
+       end process buf;
+       end bufif1;
+

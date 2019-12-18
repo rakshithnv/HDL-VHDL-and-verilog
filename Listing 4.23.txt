@@ -1,0 +1,117 @@
+Listing 4.23?HDL Description of a 3-Bit Synchronous Up/Down Counter with Clear and Terminal Count—VHDL and Verilog
+      
+      ***Begin Listing***
+      VHDL 3-Bit Synchronous Up/Down Counter with Clear and Terminal Count
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity up_down is
+           port (clr, Dir, clk : in std_logic; TC : out std_logic;
+               Q, Qbar : buffer std_logic_vector (2 downto 0));
+       end up_down;
+       
+       architecture Ctr_updown of up_down is
+       --Some simulators will not allow mapping between
+       --buffer and out. In this
+       --case, change all out to buffer.
+       
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component or2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component JK_FF
+       port (I1, I2, I3 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       
+       
+       for all : JK_FF use entity work.bind32 (JK_Master);
+       for all : inv use entity work.bind1 (inv_1);
+       for all : and2 use entity work.bind2 (and2_4);
+       for all : and3 use entity work.bind3 (and3_4);
+       for all : or2 use entity work.bind2 (or2_4);
+       
+       signal clrbar, Dirbar, J1, K1, J2, K2 : std_logic;
+       signal s : std_logic_vector (11 downto 0);
+       begin
+           in1 : inv port map (clr, clrbar);
+           in2 : inv port map (Dir, Dirbar);
+           an1 : and2 port map (Dirbar, Qbar(0), s(0));
+           an2 : and2 port map (Dir, Q(0), s(1));
+           r1 : or2 port map (s(0), s(1), s(2));
+           an3 : and2 port map (s(2), clrbar, s(3));
+           r2 : or2 port map (s(3), clr, K1);
+           r3 : or2 port map (s(2), Q(1), s(4));
+           an4 : and2 port map (clrbar, s(4), J1);
+           an5 : and3 port map (Dirbar, Qbar(1), Qbar(0), s(5));
+           an6 : and3 port map (Dir, Q(1), Q(0), s(6));
+           r4 : or2 port map (s(6), s(5), s(7));
+           an7 : and2 port map (s(7), clrbar, J2);
+           r5 : or2 port map (J2, clr, K2);
+           
+           JKFF0 : JK_FF port map (clrbar, '1', clk, Q(0), Qbar(0));
+           JKFF1 : JK_FF port map (J1, K1, clk, Q(1), Qbar(1));
+           JKFF2 : JK_FF port map (J2, K2, clk, Q(2), Qbar(2));
+           
+           an8 : and3 port map (clrbar, Qbar(1), Qbar(0), S(8));
+           an9 : and3 port map (Dirbar, Qbar(2), s(8), S(9));
+       
+       -- For an8 and an9,  we could have used 5-input and gate;
+       -- but two and gates with a reasonable number of
+       -- fan-in (three-input) is preferred. Same
+       -- argument for an10 and an11*/
+       
+           an10 : and3 port map (clrbar, Q(0), Q(1), S(10));
+           an11 : and3 port map (Dir, Q(2), s(10), S(11));
+           r6 : or2 port map (s(9), s(11), TC);
+       end Ctr_updown;
+      
+      Verilog 3-Bit Synchronous Up/Down Counter with Clear and Terminal 
+               Count
+       
+       module up_down (clr, Dir, clk, Q, Qbar, TC);
+       input clr, Dir, clk;
+       output [2:0] Q, Qbar;
+       output TC;
+           not #1 (clrbar, clr);
+           not #1 (Dirbar, Dir);
+           and #4 (s0, Dirbar, Qbar[0]);
+           and #4 (s1, Dir, Q[0]);
+           or #4 (s2, s0, s1);
+           and #4 (s3, s2, clrbar);
+           or #4 (K1, s3, clr);
+           or #4 (s4, s2, Q[1]);
+           and #4 (J1, clrbar, s4);
+           and #4 (s5, Dirbar, Qbar[1], Qbar[0]);
+           and #4 (s6, Dir, Q[1], Q[0]);
+           or #4 (s7, s6, s5);
+           and #4 (J2, s7, clrbar);
+           or #4 (K2, J2, clr);
+           
+           JK_FF JKFF0 (clrbar, 1'b1, clk, Q[0], Qbar[0]);
+           JK_FF JKFF1 (J1, K1, clk, Q[1], Qbar[1]);
+           JK_FF JKFF2 (J2, K2, clk, Q[2], Qbar[2]);
+           
+           and #4 an8 (s8, clrbar, Qbar[1], Qbar[0]);
+           and #4 an9 (s9, Dirbar, Qbar[2], s8);
+       
+       /* For an8 and an9, a five-input and gate could have been used;
+           but two and gates with a reasonable number of fan-in
+           (three-input) is preferred. Same argument for an10 and an11*/
+       
+           and #4 an10 (s10, clrbar, Q[0], Q[1]);
+           and #4 an11 (s11, Dir, Q[2], s10);
+           or #4 (TC, s9, s11);
+       endmodule
+

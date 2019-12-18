@@ -1,0 +1,69 @@
+Listing 10.30?Example of Case with Storage
+      
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.all;
+       package types is
+       type states is (state0, state1, state2, state3);
+       end;
+       
+       
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       use work.types.all;
+       entity state_machine is
+           port (A, clk : in std_logic; pres_st : buffer states; 
+                  Z : out std_logic);
+       end state_machine;
+       
+       architecture st_behavioral of state_machine is
+       
+       begin
+       
+       FM : process (clk, pres_st, A)
+       variable present : states := state0;
+       begin
+       if (clk = '1' and clk'event) then
+      --clock’event is an attribute to the signal clk; the above if
+      -- Boolean expression means the positive edge of clk
+       
+           case pres_st is
+               when state0 =>
+               if A ='1' then
+               present := state1;
+               Z <= '0';
+               else
+               present := state0;
+               Z <= '1';
+               end if;
+       
+               when state1 => if A ='1' then
+               present := state2;
+               Z <= '0';
+               else
+               present := state3;
+               Z <= '0';
+               end if;
+       
+               when state2 => if A ='1' then
+               present := state3;
+               Z <= '1';
+               else
+               present := state0;
+               Z <= '0';
+               end if;
+       
+               when state3 => if A ='1' then
+               present := state0;
+               Z <= '1';
+               else
+               present := state2;
+               Z <= '1';
+               end if;
+           end case;
+       
+       pres_st <= present;
+       end if;
+       end process FM;
+       end st_behavioral;
+

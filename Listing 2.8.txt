@@ -1,0 +1,65 @@
+Listing 2.8?3-Bit Carry-Lookahead Adder Case Study—VHDL and Verilog
+      
+      VHDL 3-Bit Carry-Lookahead Adder Case Study Description
+       --II. CARRY-LOOKAHEAD ADDER 
+       architecture lkh_DtFl of adders_RL is
+       --Assume 4.0-ns propagation delay for all gates 
+       --including a 3-input xor. 
+       signal c0, c1 : std_logic;
+       signal p, g : std_logic_vector (2 downto 0);
+       constant delay_gt : time := 4 ns;
+       begin
+       
+       g(0) <= x(0) and y(0) after delay_gt;
+       g(1) <= x(1) and y(1) after delay_gt;
+       g(2) <= x(2) and y(2) after delay_gt;
+       p(0) <= x(0) or y(0) after delay_gt; 
+       p(1) <= x(1) or y(1) after delay_gt;
+       p(2) <= x(2) or y(2) after delay_gt;
+       c0 <= g(0) or (p(0) and cin) after 2*delay_gt; 
+       
+       c1 <= g(1) or (p(1) and g(0)) or (p(1) and p(0) 
+             and cin) after 2*delay_gt;
+       cout <= g(2) or (p(2) and g(1)) or (p(2) and p(1) 
+             and g(0)) or
+           (p(2) and p(1) and p(0) and cin) after 2*delay_gt;
+       
+       sum(0) <= (p(0) xor g(0)) xor cin after delay_gt; 
+       sum(1) <= (p(1) xor g(1)) xor c0 after delay_gt;
+       sum(2) <= (p(2) xor g(2)) xor c1 after delay_gt;
+       end lkh_DtFl;
+      
+      Verilog 3-Bit Carry-Lookahead Adder Case Study Description
+       // II. CARRY-LOOKAHEAD ADDER 
+       module lkahd_adder (x, y, cin, sum, cout);
+       input [2:0] x, y;
+       input cin;
+       output [2:0] sum;
+       output cout;
+       /*Assume 4.0-ns propagation delay for all gates 
+            including a 3-input xor.*/                     
+       
+       wire c0, c1;
+       wire [2:0] p, g;
+       time delay_gt = 4;
+       assign #delay_gt g[0] = x[0] & y[0];
+       assign #delay_gt g[1] = x[1] & y[1];
+       assign #delay_gt g[2] = x[2] & y[2];
+       assign #delay_gt p[0] = x[0] | y[0];
+       assign #delay_gt p[1] = x[1] | y[1];
+       assign #delay_gt p[2] = x[2] | y[2];
+       assign #(2*delay_gt) c0 = g[0] | (p[0] & cin);
+       
+       
+       assign #(2*delay_gt) c1 = g[1] | (p[1] & g[0]) |
+           (p[1] & p[0] & cin);
+       
+       
+       assign #(2*delay_gt) cout = g[2] | (p[2] & g[1]) | (p[2] &
+           p[1] & g[0]) | (p[2] & p[1] & p[0] & cin);
+       
+       assign #delay_gt sum[0] = (p[0] ^ g[0]) ^ cin;
+       assign #delay_gt sum[1] = (p[1] ^ g[1]) ^ c0;
+           assign #delay_gt sum[2] = (p[2] ^ g[2]) ^ c1;
+       endmodule
+

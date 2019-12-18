@@ -1,0 +1,77 @@
+Listing 3.11?HDL Code for a 4-Bit Counter with Synchronous Clear—VHDL and Verilog
+      
+      VHDL 4-Bit Counter with Synchronous Clear Description
+       library ieee;
+       use ieee.std_logic_1164.all;
+       entity CNTR_LOP is
+       port (clk, clr : in std_logic; q :
+           buffer std_logic_vector (3 downto 0));
+       end CNTR_LOP;
+       architecture CTR_LOP of CNTR_LOP is
+       begin
+       ct : process(clk)
+       variable temp : std_logic_vector (3 downto 0) := "0000";
+       variable result : integer := 0;
+       begin 
+       if rising_edge (clk) then
+           if (clr = '0') then
+               result := 0;
+       -- change binary to integer 
+               lop1 : for i in 0 to 3 loop
+                   if temp(i) = '1' then
+                   result := result + 2**i;
+                   end if;
+               end loop;
+       -- increment result to describe a counter
+               result := result + 1;
+       -- change integer to binary 
+               for j in 0 to 3 loop
+               if (result MOD 2 = 1) then
+                   temp (j) := '1';
+                   else temp (j) := '0';
+               end if;
+       -- integer division by 2
+               result := result/2;
+               end loop;
+           else temp := "0000";
+           end if;
+       q <= temp;
+       end if;
+       end process ct;
+       end CTR_LOP;
+      
+      Verilog 4-Bit Counter with Synchronous Clear Description
+       module CNTR_LOP (clk, clr, q);
+       input clk, clr;
+       output [3:0] q;
+       reg [3:0] q;
+       integer i, j, result;
+       initial
+       begin
+       q = 4'b0000; //initialize the count to 0
+       end
+       always @ (posedge clk)
+       begin
+           if (clr == 0)
+           begin
+               result = 0;
+               //change binary to integer
+               for (i = 0; i < 4; i = i + 1)
+                   begin
+                       if (q[i] == 1)
+                       result = result + 2**i;
+                   end
+                   result = result + 1;
+                   for (j = 0; j < 4; j = j + 1)
+                   begin
+                       if (result %2 == 1)
+                       q[j] = 1;
+                       else
+                       q[j] = 0;
+                       result = result/2;
+                   end
+               end
+               else q = 4'b0000;
+       end
+       endmodule
+

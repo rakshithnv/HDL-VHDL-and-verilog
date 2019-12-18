@@ -1,0 +1,13 @@
+Listing 10.31 A For-Loop Statement.  a) VHDL. b) Verilog.
+      a) VHDL Description
+for i in 0 to 63 loop		
+    temp(i) := temp(i) + b(i);		 			    
+end loop;				
+
+b) Verilog Description
+
+for i=0; i<=63;i=i+1
+    begin
+      temp[i] = temp[i] + b[i];
+    end
+

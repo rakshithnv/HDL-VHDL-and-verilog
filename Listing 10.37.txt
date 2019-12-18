@@ -1,0 +1,26 @@
+Listing 10.37?Code for Exercise 10.1
+      
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       use ieee.numeric_std.all;
+       
+       entity IF_sgned is
+       port (a : in signed (3 downto 0); Y : out Boolean);
+       end IF_sgned;
+       
+       architecture IF_sgned of IF_sgned is
+       
+       begin
+       
+       IfB : process (a)
+       variable tem : Boolean;
+       begin
+       if (a < "1100") then
+       tem := true;
+       else
+       tem := false;
+       end if;
+       Y <= tem;
+       end process;
+       end IF_sgned;
+

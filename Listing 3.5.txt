@@ -1,0 +1,21 @@
+Listing 3.5?VHDL Code for Behavioral Description of D-Latch Using Signal-Assignment Statements
+      
+       entity Dltch_sig is
+       port (d, E : in bit; Q : buffer bit; Qb : out bit);
+       --Q is declared as a buffer because it is an input/output 
+       --signal; it appears on both the left and right
+       -- hand sides of assignment
+       --statements.
+       end Dltch_sig;
+       architecture DL_sig of Dltch_sig is
+       begin
+       process (d, E)
+       begin
+           if E = '1' then
+               Q <= d;      -- signal assignment
+               Qb <= not Q; -- signal assignment
+           end if;
+       end process;
+       
+       end DL_sig;
+

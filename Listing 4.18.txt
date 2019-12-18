@@ -1,0 +1,42 @@
+Listing 4.18?HDL Description of a 3-Bit Ripple Carry Adder—VHDL and Verilog
+      
+      VHDL 3-Bit Ripple Carry Adder
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity three_bit_adder is
+       port(x, y : in std_logic_vector (2 downto 0);
+           cin : in std_logic; sum : out std_logic_vector (2 downto 0);
+           cout : out std_logic);
+       end three_bit_adder;
+       
+       architecture three_bitadd of three_bit_adder is
+       component full_adder
+       port (I1, I2, I3 : in std_logic; O1, O2 : out std_logic);
+       end component;
+       for all : full_adder use entity work.bind32 (full_add);
+       signal carry : std_logic_vector (1 downto 0);
+       begin
+           M0 : full_adder port map (x(0), y(0), cin, sum(0), carry(0));
+           M1 : full_adder port map (x(1), y(1), carry(0), sum(1), carry(1));
+           M2 : full_adder port map (x(2), y(2), carry(1), sum(2), cout);
+       end three_bitadd;
+      
+      Verilog 3-Bit Ripple Carry Adder
+       module three_bit_adder (x, y, cin, sum, cout);
+       input [2:0] x, y;
+       input cin;
+       output [2:0] sum;
+       output cout;
+       wire [1:0] carry;
+           FULL_ADDER M0 (x[0], y[0], cin, sum[0], carry[0]);
+           FULL_ADDER M1 (x[1], y[1], carry[0], sum[1], carry[1]);
+           FULL_ADDER M2 (x[2], y[2], carry[1], sum[2], cout);
+       
+       /* It is assumed that the module FULL_ADDER
+           (Listing 4.13) is attached by the simulator to
+           the module three_bit_adder so, no need to
+           rewrite the module FULL_ADDER.*/
+       
+       endmodule
+

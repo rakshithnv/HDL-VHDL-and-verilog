@@ -1,0 +1,45 @@
+Listing 4.13 HDL Description of a Full Adder (Figures 4.6a and 4.6b)—VHDL and Verilog
+      
+      VHDL Full Adder Description
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity FULL_ADDER is
+           Port (x, y, cin : in std_logic; sum, carry : out std_logic);
+       end FULL_ADDER;
+       architecture full_add of FULL_ADDER is
+       component HA
+           Port (I1, I2 : in std_logic; O1, O2 : out std_logic);
+       end component;
+       component or2
+           Port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       for all : HA use entity work.bind22 (HA);
+       for all : or2 use entity work.bind2 (or2_0);
+       signal s0, c0, c1 : std_logic;
+       
+       begin
+           HA1 : HA port map (y, cin, s0, c0);
+           HA2 : HA port map (x, s0, sum, c1);
+           r1 : or2 port map (c0, c1, carry);
+       end full_add;
+      
+      Verilog Full Adder Description
+       module FULL_ADDER (x, y, cin, sum, carry);
+       input x, y, cin;
+       output sum, carry;
+       HA H1 (y, cin, s0, c0);
+       HA H2 (x, s0, sum, c1);
+       //The above two statements bind module HA
+       //to the present module FULL_ADDER
+       or (carry, c0, c1);
+       endmodule
+       
+       
+       module HA (a, b, s, c);
+       input a, b;
+       output s, c;
+       xor (s, a, b);
+       and (c, a, b);
+       endmodule
+

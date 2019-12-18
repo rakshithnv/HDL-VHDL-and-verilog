@@ -1,0 +1,43 @@
+Listing 2.3?HDL Code of a 2x1 Multiplexer—VHDL and Verilog
+      
+      VHDL  2x1 Multiplexer Description 
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity mux2x1 is
+       port (A, B, SEL, Gbar : in std_logic; 
+           Y : out std_logic); 
+       end mux2x1;						 						
+       architecture MUX_DF of mux2x1 is
+       signal S1, S2, S3, S4, S5 : std_logic;
+           Begin	 
+       
+       -- Assume 7 nanoseconds propagation delay
+       -- for all and, or, and not.
+       
+       st1: Y <= S4 or S5 after 7 ns;
+       st2: S4 <= A and S2 and S1 after 7 ns;
+       st3: S5 <= B and S3 and S1 after 7 ns;
+       st4: S2 <= not SEL after 7 ns;
+       st5: S3 <= not S2 after 7 ns; 
+       st6: S1 <= not Gbar after 7 ns;
+       end MUX_DF; 
+      
+      Verilog Description:  2x1 Multiplexer
+       module mux2x1 (A, B, SEL, Gbar, Y);
+       input A, B, SEL, Gbar;
+       output Y;
+       wire S1, S2, S3, S4, S5;
+       
+       /* Assume 7 time units delay for all and, or, not. 
+       In Verilog we cannot use specific time units, 
+       such as nanoseconds. The delay here is 
+       expressed in simulation screen units. */
+       
+       assign #7 Y = S4 | S5;      //st1
+       assign #7 S4 = A & S2 & S1; //st2
+       assign #7 S5 = B & S3 & S1; //st3
+       assign #7 S2 = ~ SEL;       //st4
+       assign #7 S3 = ~ S2;        //st5
+       assign #7 S1 = ~ Gbar;      //st6
+       endmodule
+

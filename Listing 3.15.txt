@@ -1,0 +1,49 @@
+Listing 3.15?Antidiuretic Hormone Mechanism—VHDL and Verilog
+
+      VHDL Antidiuretic Hormone Mechanism Description
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       use IEEE.STD_LOGIC_ARITH.ALL;
+       use IEEE.STD_LOGIC_UNSIGNED.ALL;
+       entity ADH_BEH is
+           port (clk : in std_logic; BP : in natural; 
+       ADH : out natural);
+       -- Assume BP takes only positive integer values
+       end;
+       architecture ADH_XT of ADH_BEH is
+       begin
+       ADHP : process (clk)
+       variable resADH : natural := 0;
+       begin
+       if (clk = '1') then 
+           if Bp <= 20 then resADH := 100;
+           elsif Bp > 45 then resADH := 0;
+           else
+               resADH := Bp * (-4) + 180;
+           end if; 
+       end if;
+       ADH <= resADH;
+       end process ADHP;
+       end ADH_XT;
+      
+      ***Begin Verilog***
+      Verilog Antidiuretic Hormone Mechanism Description
+       module ADH_BEH (clk, BP, ADH);
+       input clk;
+       input [8:0] BP;
+       // Assume BP takes only positive integer values
+       output [8:0] ADH;
+       reg [8:0] ADH;
+       always @ (clk)
+       begin
+       if (clk == 1)
+       begin
+           if (BP <= 20) ADH = 100;
+           else if (BP > 45.0) ADH = 0;
+           else
+           ADH = BP * (-4) + 180.0;
+       end
+       end
+       
+       endmodule
+

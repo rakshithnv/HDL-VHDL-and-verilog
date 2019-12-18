@@ -1,0 +1,13 @@
+Listing 1.1?Example of Entity Architecture
+      
+       entity illustrate is 
+       port (I1, I2 : in bit; O1, O2 : out bit);
+       end;
+       
+       architecture dtfl_ex of illustrate is
+       begin 
+       O1 <= I1 xor I2; -- statement 1
+       O2 <= I1 and I2; -- statement 2
+       
+       end dtfl_ex;
+

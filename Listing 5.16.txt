@@ -1,0 +1,67 @@
+Listing 5.16?HDL Code for an SR-Latch—VHDL and Verilog
+      
+      VHDL SR-Latch Description
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       
+       entity SR_Latch is
+       port (S, R : in std_logic; Q, Qbar : inout std_logic);
+       end SR_Latch;
+       
+       architecture SR of SR_Latch is
+       
+       component nmos
+       port (O1 : inout std_logic; I1, I2 : in std_logic);
+       --port O1 is selected here to be inout to match
+       --its use in the latch circuit
+       end component;
+       
+       component pmos
+       port (O1 : inout std_logic; I1, I2 : in std_logic);
+       --port O1 is selected here to be inout
+       --to match its use in the latch circuit
+       end component;
+       
+       for all : pmos use entity work.mos (pmos_behavioral); 
+       for all : nmos use entity work.mos (nmos_behavioral);
+       --In this example only, the mode of Output port O1
+       --in the entity “mos” should
+       --be declared as inout instead of out.
+       constant vdd : std_logic := '1';
+       constant gnd : std_logic := '0';
+       signal s0, s1, s2 : std_logic;
+       
+       begin
+       
+       n1 : nmos port map (Qbar, gnd, S);
+       n2 : nmos port map (Qbar, gnd, Q);
+       p1 : pmos port map (s0, vdd, Q);
+       p2 : pmos port map (Qbar, s0, S);
+       
+       n3 : nmos port map (Q, gnd, Qbar);
+       n4 : nmos port map (Q, gnd, R);
+       p3 : pmos port map (s1, vdd, R);
+       p4 : pmos port map (Q, s1, Qbar);
+       
+       end SR;
+      
+      Verilog SR-Latch Description
+       module SR_latch (S, R, Q, Qbar);
+       input S, R;
+       output Q, Qbar;
+       supply1 vdd;
+       supply0 gnd;
+       
+       nmos n1 (Qbar, gnd, S);
+       nmos n2 (Qbar, gnd, Q);
+       pmos p1 (s0, vdd, Q);
+       pmos p2 (Qbar, s0, S);
+       
+       nmos n3 (Q, gnd, Qbar);
+       nmos n4 (Q, gnd, R);
+       pmos p3 (s1, vdd, R);
+       pmos p4 (Q, s1, Qbar);
+       
+       endmodule
+

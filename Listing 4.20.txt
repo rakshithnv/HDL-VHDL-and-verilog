@@ -1,0 +1,67 @@
+Listing 4.20?HDL Description of an SRAM Memory Cell—VHDL and Verilog
+      
+      VHDL SRAM Memory Cell Description
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity memory is
+           port (Sel, RW, Din : in std_logic; O1: buffer std_logic );
+       end memory;
+       
+       architecture memory_str of memory is
+       --Some simulators will not allow mapping between
+       --buffer and out. In this
+       --case, change all out to buffer.
+       
+       component and3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component or2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component bufif1
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component SR_Latch
+           port (I1, I2 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       for all : and3 use entity work.bind3 (and3_0);
+       for all : inv use entity work.bind1 (inv_0);
+       for all : or2 use entity work.bind2 (or2_0);
+       for all : bufif1 use entity work.bind2 (bufif1);
+       for all : SR_Latch use entity work.bind22 (SR_Latch);
+       signal RWb, Dinb, S, S1, R, O11, Q : std_logic;
+       begin
+           in1 : inv port map (RW, RWb);
+           in2 : inv port map (Din, Dinb);
+           a1 : and3 port map (Sel, RWb, Din, S);
+           a2 : and3 port map (Sel, RWb, Dinb, R);
+           SR1 : SR_Latch port map (S, R, Q, open);
+       --open is a predefined word;
+       --it indicates that the port is left open.
+           a3 : and3 port map (Sel, RW, Q, S1);
+           or1 : or2 port map (S1, S, O11);
+           buf1 : bufif1 port map (O11, Sel, O1);
+       end memory_str;
+      
+      Verilog SRAM Memory Cell Description
+       module memory (Sel, RW, Din, O1);
+       input Sel, RW, Din;
+       output O1;
+           not (RWb, RW);
+           not (Dinb, Din);
+           and (S, Sel, RWb, Din);
+           and (R, Sel, RWb, Dinb);
+           SR_Latch RS1 (R, S, Q, Qbar);
+           and (S1, Sel, RW, Q);
+           or (O11, S1, S);
+           bufif1 (O1, O11, Sel);
+       endmodule
+

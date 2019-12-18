@@ -1,0 +1,46 @@
+Listing 4.27?HDL Description of N-Bit Memory Word Using Generate—VHDL and Verilog
+      
+      VHDL N-Bit Memory Word Using Generate
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity Memory_word is
+           Generic (N : integer := 7);
+       port (Data_in : in std_logic_vector (N downto 0); sel, R_W : in
+           std_logic; Data_out : out std_logic_vector (N downto 0));
+       end Memory_word;
+       
+       architecture Word_generate of Memory_word is
+       component memory_cell
+           Port (Sel, RW, Din : in std_logic; O1 : buffer std_logic );
+       end component;
+       
+       for all : memory_cell use entity work.memory (memory_str);
+           begin
+           G1 : for i in 0 to N generate
+       M : memory_cell port map (sel, R_W, Data_in(i), Data_out(i));
+       
+           end generate;
+       
+       end Word_generate;
+      
+      Verilog N-Bit Memory Word Using Generate
+       module Memory_Word (Data_in, sel, R_W, Data_out);
+       
+       parameter N = 7;
+       input [N:0] Data_in;
+       input sel, R_W;
+       output [N:0] Data_out;
+       
+           generate
+           genvar i;
+           for (i = 0; i <= N; i = i + 1)
+       
+           begin : u
+           memory M1 (sel, R_W, Data_in [i], Data_out[i]);
+       
+           end
+       
+           endgenerate
+       
+       endmodule
+

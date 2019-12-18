@@ -1,0 +1,35 @@
+Listing 2.4?HDL Code for a 2x2 Unsigned Combinational Array Multiplier—VHDL and Verilog
+      
+      VHDL 2x2 Unsigned Combinational Array Multiplier Description 
+       library IEEE; 
+       use IEEE.STD_LOGIC_1164.ALL; 
+       entity mult_arry is
+           port (a, b : in std_logic_vector(1 downto 0);
+           P : out std_logic_vector (3 downto 0));
+       end mult_arry;
+       
+       architecture MULT_DF of mult_arry is
+       begin
+       -- For simplicity propagation delay times are not considered
+       -- in this example.
+       P(0) <= a(0) and b(0); 
+       P(1) <= (a(0) and b(1)) xor (a(1) and b(0)); 
+       P(2) <= (a(1) and b(1)) xor ((a(0) and b(1)) and (a(1) and
+                  b(0)));
+       P(3) <= (a(1) and b(1)) and ((a(0) and b(1)) and (a(1) and
+                  b(0)));
+       end MULT_DF;
+      
+      Verilog 2x2 Unsigned Combinational Array Multiplier Description
+       module mult_arry (a, b, P);
+       input [1:0] a, b;
+       output [3:0] P;
+       /*For simplicity, propagation delay times are not 
+       considered in this example.*/
+       
+       assign P[0] = a[0] & b[0];
+       assign P[1] = (a[0] & b[1]) ^ (a[1] & b[0]);
+       assign P[2] = (a[1] & b[1]) ^ ((a[0] & b[1]) & (a[1] & b[0]));
+       assign P[3] = (a[1] & b[1]) & ((a[0] & b[1])& (a[1] & b[0]));
+       endmodule
+

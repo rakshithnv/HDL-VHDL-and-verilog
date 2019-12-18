@@ -1,0 +1,37 @@
+Listing 10.25?Example of If Statement with Storage-VHDL and Verilog
+      
+      
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity If_store is
+       port (a, X : in std_logic; Y : out std_logic);
+       end If_store;
+       
+       architecture If_store of If_store is
+       
+       begin
+           process (a, X)
+           begin
+               if (a = '1') then
+               Y <= X;
+       
+               end if;
+           end process;
+       
+       
+       end If_store;
+      
+      Verilog If Statement with Storage
+       module If_store (a, X, Y);
+       input a, X;
+       output Y;
+       reg Y;
+       always @ (a, X)
+           begin
+               if (a == 1'b1)
+               Y = X;
+       
+           end
+       endmodule
+

@@ -1,0 +1,85 @@
+Listing 3.12?HDL Code for a 4-Bit Counter with Synchronous Hold—VHDL and Verilog
+      
+      VHDL 4-Bit Counter with Synchronous Hold Description
+       library ieee;
+       use ieee.std_logic_1164.all;
+       entity CNTR_Hold is
+       port (clk, hold : in std_logic; q : buffer std_logic_vector (3
+             downto 0));
+       
+       end CNTR_Hold;
+       architecture CNTR_Hld of CNTR_Hold is
+       begin
+       ct : process (clk)
+       variable temp : std_logic_vector
+           (3 downto 0) := "0000";
+           -- temp is initialized to 0 so count starts at 0
+           variable result : integer := 0;
+           begin 
+           if rising_edge (clk) then
+               result := 0;
+           -- change binary to integer 
+               lop1 : for i in 0 to 3 loop
+               if temp(i) = '1' then
+                   result := result + 2**i;
+                   end if;
+       
+               end loop;
+           -- increment result to describe a counter
+               result := result + 1;
+               -- change integer to binary
+               lop2 : for i in 0 to 3 loop
+           -- exit the loop if hold = 1
+               exit when hold = '1';
+           -- “when” is a predefined word 
+               if (result MOD 2 = 1) then
+                   temp (i) := '1';
+               else
+                   temp (i) := '0';
+               end if;
+           --Successive division by 2
+               result := result/2;
+               end loop;
+               q <= temp;
+           end if;
+           end process ct;
+           end CNTR_Hld;
+      
+      Verilog 4-Bit Counter with Synchronous Hold Description
+       module CT_HOLD (clk, hold, q);
+       input clk, hold;
+       output [3:0] q;
+       reg [3:0] q;
+       integer i, result;
+       initial
+       begin
+       q = 4'b0000; //initialize the count to 0
+       end
+       always @ (posedge clk)
+       begin
+       result = 0;
+       
+       //change binary to integer
+       
+       for (i = 0; i <= 3; i = i + 1)
+       begin
+       if (q[i] == 1)
+       result = result + 2**i;
+       end
+       result = result + 1;
+       for (i = 0; i <= 3; i = i + 1)
+       begin
+       if (hold == 1)
+       i = 4; //4 is out of range, exit.
+       else
+           begin
+               if (result %2 == 1)
+               q[i] = 1;
+               else
+               q[i] = 0;
+               result = result/2;
+               end
+       end
+       end
+       endmodule
+

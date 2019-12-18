@@ -1,0 +1,24 @@
+Listing 5.18?Verilog Code for a D-Latch Using NMOS and PMOS Switches
+      
+       module D_latch (D, E, Q, Qbar);
+       input D, E;
+       output Q, Qbar;
+       supply1 vdd;
+       supply0 gnd;
+       
+       pmos (Ebar, vdd, E);
+       nmos (Ebar, gnd, E);
+       
+       
+       nmos n1 (s0, gnd, D);
+       nmos n2 (Qbar, s0, E);
+       nmos n3 (s1, gnd, Q);
+       nmos n4 (Qbar, s1, Ebar);
+       
+       pmos p1 (Qbar, s2, D);
+       pmos p2 (Qbar, s2, E);
+       pmos p3 (s2, vdd, Q);
+       pmos p4 (s2, vdd, Ebar);
+       
+       endmodule
+

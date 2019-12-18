@@ -1,0 +1,21 @@
+Listing 10.19?VHDL Variable-Assignment Statement
+      
+       library ieee;
+       use ieee.std_logic_1164.all;
+       
+       entity parity_even is
+           port (x : in std_logic_vector (3 downto 0); 
+                  C : out std_logic);
+       end parity_even;
+       
+       architecture behav_prti of parity_even is
+       begin
+       
+       P1 : process (x)
+       variable c1 : std_logic;
+           begin
+               c1 := (x(0) xor x(1)) xor (x(2) xor x(3));
+               C <= c1;
+           end process P1;
+       end behav_prti;
+

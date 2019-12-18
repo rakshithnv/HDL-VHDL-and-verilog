@@ -1,0 +1,44 @@
+Listing 2.5?HDL Code for a D-Latch—VHDL and Verilog
+      
+      VHDL D-Latch Description
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity D_Latch is
+       port (D, E : in std_logic;
+           Q, Qbar : buffer std_logic);
+       -- Q and Qbar are declared as buffer because they act as 
+       --both input and output, they appear on the right and left 
+       --hand side of signal assignment statements. inout or
+       --  linkage could have been used instead of buffer.
+       end D_Latch;
+       
+       architecture DL_DtFl of D_Latch is
+       constant Delay_EorD : Time := 9 ns;
+       constant Delay_inv : Time := 1 ns;
+       begin
+       --Assume 9-ns propagation delay time between 
+       --E or D and Qbar; and 1 ns between Qbar and Q.
+       
+       Qbar <= (D and E) nor (not E and Q) after Delay_EorD;
+       Q <= not Qbar after Delay_inv;
+       end DL_DtFl;
+      
+      Verilog D-Latch Description
+       module D_latch (D, E, Q, Qbar);
+       input D, E;
+       output Q, Qbar;
+       
+       /* Verilog treats the ports as internal ports,
+       so Q and Qbar are not considered here as
+       both input and output. If the port is
+       connected externally as bidirectional,
+       then we should use inout. */
+       
+       time Delay_EorD = 9;
+       time Delay_inv = 1;
+       assign #Delay_EorD Qbar = ~((E & D) |
+           (~E & Q));
+       assign #Delay_inv Q = ~ Qbar;
+       endmodule
+

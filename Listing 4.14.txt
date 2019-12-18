@@ -1,0 +1,35 @@
+Listing 4.14?HDL Description of an SR Latch with NOR Gates
+      
+      VHDL SR Latch with NOR Gates
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity SR_latch is
+       port (R, S : in std_logic;
+           Q, Qbar : buffer std_logic);
+       
+       --Q, Qbar are declared buffer because
+       --they behave as input and output.
+       
+       end SR_latch;
+       
+       architecture SR_strc of SR_latch is
+       --Some simulators would not allow mapping between
+       --buffer and out. In this
+       --case, change all out to buffer.
+       component nor2
+       port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : nor2 use entity work.bind2 (nor2_0);
+       begin
+           n1 : nor2 port map (S, Q, Qbar);
+           n2 : nor2 port map (R, Qbar, Q);
+       end SR_strc;
+      
+      Verilog SR Latch with NOR Gates
+       module SR_Latch (R, S, Q, Qbar);
+       input R, S;
+       output Q, Qbar;
+       nor (Qbar, S,Q);
+       nor (Q, R, Qbar);
+       endmodule
+

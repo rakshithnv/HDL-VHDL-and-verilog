@@ -1,0 +1,2712 @@
+      
+      [CRM/AU: Just noting that from here on (Chapters 4–10), there is no longer a section on “Common Programming Errors.” Too bad; I found them well written and thought them to be quite helpful to HDL students.][The proposed web page of the book will post  more of Common Programming errors ]
+      
+Chapter 4?Structural Descriptions
+      
+In This ChapterOBJECTIVES
+* Understand the concept of structural description, including the binding of modules.
+* Identify the basic statements of structural description, such as component, use, and, or, not, xor, nor, generate, generic, and parameter.
+* Review and understand the fundamentals of digital logic design for digital systems, such as adders, multiplexers, decoders, comparators, encoders, latches, flip-flops, counters, and memory cells.
+* Understand the concept of sequential finite- state machines.
+      
+      In this Chapter we cover structural description. Both gate level and register level descriptions are discussed. Both VHDL and Verilog descriptions are discussed.
+      
+      
+4.1?Highlights of Structural Descriptions
+Structural description is best implemented when the digital logic of the system’s hardware components of the system to be described is known. An example of such system is a 2x1 multiplexer. We know tThe components of theis system are known:, AND , OR, and Iinvert gates. Structural description can easily describe suchthese components. On the other hand, it is hard (if not impossible) to describe the digital logic of,a system representing say, the process of secretion of hormone secretions in the blood is hard, if not impossible, to know its digital logic; thereforeaccordingly, another description, such as behavioral or mixed, may be implemented. Structural description is very close to schematic simulation.
+      In this chapter, structural description is covered. Both gate-level and register-level descriptions are discussed for VHDL and Verilog.
+      
+       
+Facts
+* Structural description simulates the system by describing its logical components. The components can be in Ggate Llevel, such as AND gate(s), OR gate(s), or NOT gate(s);, or components can be in a higher logical level, such as Register Transfer -Level (RTL), or pProcessor Llevel.
+      
+* It is more convenient to use structural description rather than behavioral description for systems that required a specific design. Consider, for example, a system is performing the operation A + B = C. In behavioral description, we usually write C = A + B and we have no choice oin the type of adders used to perform this addition. In structural description, we can specify the type of adders, for example, look-ahead adders.
+      
+* All statements in structural description are concurrent. At any simulation time, all statements that have an event are executed concurrently.
+      
+* A major difference between VHDL and Verilog structural description is the availability of components (especially primitive gates) to the user. Verilog recognizes all the primitive gates, such as AND, OR, XOR, NOT, and XNOR gates. Basic VHDL packages do not recognize any gates unless the package is linked to one or more librariey(s), packages, or modules that have the gates description. Usually, the user develops these links, as will besuch link as it is done in this Cchapter.
+      
+* Although we use structural description in this cChapter to simulate digital systems, this does not mean that we can only use one type of description can be used in athe same module. In fact, in most of the descriptions of complex systems, we use mixed types of descriptions (e.g., data flow, behavioral, structural, or switch-level) are used in the same module, (sSee Chapter 7, “Mixed-Type Descriptions”).
+      
+4.2?Organization of the Structural Description
+Listing 4.1 shows a simple example of HDL code that describesing a system, using structural description. Listing 4.1a shows the VHDL description and Listing 4.1b shows the Verilog Description. The entity (VHDL) or  (module (Verilog) name is “system”; there are two inputs, (a, and b,) and two outputs, (sum and cout).
+      In the VHDL description, the structural code has two parts:, declaration and instantiation.     In declaration, all of the different types of components are declared. For example, the statements:
+      
+       component xor2
+       port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+      
+declares a generic component by the name of xor2; the component has two inputs (I1, I2) and one output (O1). The name (identifier) “xor2” is not a reserved or predefined word in VHDL; it is user-selected name. To specify the type of the component (e.g., AND, OR, XOR, etc.…) additional information should be given to the simulator (s; see Listing 4.2 in this Chapter). If the system has two or more identical components, only one declaration is needed. The instantiation part of the code maps the generic inputs/ and outputs to the actual inputs/ and outputs of the system. For example, the statement:
+      
+       X1 : xor2 port map (a, b, sum);
+      
+maps input a to input I1 of xor2, input b to input I2 of xor2, and output sum to output O1 of xor2. This mapping means that the logic relationship between a, b, and sum is the same as between I1, I2, and O1. If xor2 is specified, through additional statements, to be an XOR gate, for example, then sum = a  b. AWe can specify a particular order of mapping can be specified as:
+      
+       X1 : xor2 port map (O1 => S, I1 => b , I2 => a);
+      
+       S is mapped to O1, b is mapped to I1, and a is mapped to I2. Note that we wrote the mapping of S before writing the mapping of the inputs; we could have used any other order of mapping.
+      As previously mentioned before, the structural description statements are concurrent and are driven by events.; tThis means that their execution depends on events, not on the order that the statements are placed in the module. So, placing statement A1 before statement X1 in Listing 4.1 does not change the outcome of the VHDL program.
+      
+Listing 4.1?HDL Structural Description—. a) VHDL and . b) Verilog.
+      
+      ***Begin Listing***
+      VHDL Structural Description	
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+           entity system is
+           port (a, b : in std_logic; 
+       sum, cout : out std_logic);
+           end system;
+           architecture struct_exple of system is 
+           --start declaring all different types of components
+           component xor2
+               port (I1, I2 : in std_logic;
+               O1 : out std_logic);
+           end component;
+           component and2
+               port (I1, I2 : in std_logic;
+               O1 : out std_logic);
+           end component;
+               begin
+           --Start of instantiation statements
+           X1 : xor2 port map (a, b, sum);
+           A1 : and2 port map (a, b, cout);
+           end struct_exple;
+      
+      ***Begin Verilog***
+      Verilog Structural Description
+       module system (a, b, sum, cout);
+       input a, b;
+       output sum, cout;
+       xor X1 (sum, a, b);
+       /* X1 is an optional identifier; it can be omitted.*/
+       and a1 (cout, a, b);
+       /* a1 is optional identifier; it can be omitted.*/
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+      Verilog has a large number of built-in gates; for example, the statement:
+      
+       Xor X1 (sum, a, b);
+      
+describes a 2two-input XOR gate.; tThe inputs are a and b, and the output is sum. X1 is an optional identifier for the gate; we canould have omitted the identifier and write the same XORxor gate  as :
+      
+       Xor (sum, a, b);
+      
+      Verilog has a complete list of built-in primitive gates. The output of the gate (sum) has to be listed first before the inputs (a, and b). Figure 4.1 shows a list of gates and their code in Verilog. As in structural VHDL, Verilog statements are concurrent; the order of appearance of statements in the module is irrelevant.
+      
+      *** Insert Figure 4.1 here***
+Figure 4.1?Verilog Bbuilt-in gates.
+      
+      In the Example 4.1, following we write athe complete structural code for half adder will be written.
+      
+Example 4.1?Structural Description of a Half Adder
+The logic and symbol diagrams of the half adder have been shown before (seein Figure 2.2). Listing 4.2 shows the HDL code for the half adder. As mentioned above, the VHDL does not have built-in gates. To specify xor2 as an EXCLUSIVE-OR gate, we bind (link) the component xor2 with an entity bearing the same name, “xor2”. By having the same name, all information in the entity is visible to the component. The entity specifies the relationship between I1, I2, and O1 as an EXCLUSIVE-OR; accordingly, the inputs and output of the component xor2 behave as EXCLUSIVE-OR. TWe do the same is done for component and2; and bind it is bound to the entity and2.
+      
+Listing 4.2?HDL Code of Half Adder—. a) VHDL and . b) Verilog.
+      
+      VHDL Half Adder Description
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity xor2 is
+       port(I1, I2 : in std_logic; O1 : out std_logic);
+       end xor2;
+       architecture Xor2_0 of xor2 is
+           begin
+           O1 <= I1 xor I2;
+       end Xor2_0;
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity and2 is
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end and2;
+       architecture and2_0 of and2 is
+           begin
+           O1 <= I1 and I2;
+       end and2_0;
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity half_add is
+           port (a, b : in std_logic; S, C : out std_logic);
+       end half_add;
+       
+       architecture HA_str of half_add is
+           component xor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       begin
+       X1 : xor2 port map (a, b, S);
+       A1 : and2 port map (a, b, C);
+       end HA_str;
+      
+      ***Begin Verilog***
+      Verilog Half Adder Description
+       module half_add (a, b, S, C);
+       input a, b;
+       output S, C;
+       xor (S, a, b);
+       and (C, a, b);
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+      The VHDL code looks much longer than the Verilog code. This is due to the assumption that the basic VHDL packages do not have built-in libraries or packages for logical gates. The above binding method becomes impractical when the number of gates becomes large;. Ealso every time we write a new description is written, we have to write the entities of all gates we used also must be written. In the following sections,  we discuss more efficient ways of binding are discussed.
+      
+4.3?Binding
+Binding in HDL is common practice. Binding (linking) segment1 in  of HDL code to segment2 makes all information in segment2 visible to segment1. Consider the VHDL code in Listing 4.3.
+      
+Listing 4.3?Binding bBetween Entity and Architecture in VHDL
+      
+       entity one is
+       port (I1, I2 : in std_logic; O1 : out std_logic);
+       end one;
+       architecture A of one is
+       signal s : std_logic;
+       ..........
+       end A;
+       
+       architecture B of one is
+       signal x : std_logic;
+       .......
+       end B;
+      
+      Architecture A is bound to entity one through the predefined word of;. Aalso, architecture B is bound to entity one through the predefined word of. Accordingly, I1, I2, and O1 can be used in both architecture A and architecture B. Architecture A is not bound to architecture B, and hence signal s is not recognized in architecture B.; lLikewise, signal x is not recognized in architecture A.
+      Now consider Listing 4.4 where we bind an entity is bound to a component.
+      
+Listing 4.4?Binding bBetween Entity and Component in VHDL
+      
+       entity orgate is
+       port (I1, I2 : in std_logic; O1 : out std_logic);
+       end orgate;
+       
+       architecture Or_dataflow of orgate is
+       begin
+       O1 <= I1 or I2;
+       end Or_dataflow;
+       
+       entity system is
+       port (x, y, z : in std_logic ; out r : std_logic_vector (3 downto 0);
+       end system;
+       
+       architecture system_str of system is
+       component orgate
+       port (I1, I2 : in std_logic; O1 : std_logic);
+       end component;
+       begin
+       orgate port map (x, y, r(0));
+       .......
+       end system_str;
+      
+      The component “orgate” is bound to the entity “orgate” becausey it has having the same name. Architecture Or_dataflow is bound to entity orgate by the “of”. All information in the entity is now visible to the component. Accordingly, the relationship between I1, I2, and O1 defined in the architecture or_dataflow is visible to the component orgate; hence the component orgate is an OR gate.
+      Now consider another way of VHDL binding, where we bind a library or a package is bound towith a module. Listing 4.5 shows how a Library can be bound to a module.
+      
+Listing 4.5?Binding bBetween Library and Module in VHDL
+      
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity system is
+       port (I1, I2 : in std_logic; 
+             O1 : out std_logic_vector (3 downto 0));
+       [AU: There is a close parenthesis missing from the above, and
+       please re-break; is too long.][done]
+       end system;
+       architecture lib_bound of system is
+       signal s : std_logic;
+       .............
+       end lib_bound;
+      
+       Library (library) is a predefined word,; IEEE is the name of the library,. use is a predefined word, and IEEE.STD_LOGIC_1164.ALL refers to the part of the lLibrary to be linked. Library IEEE is the library that provides the definition for the standard_logic type. This library has been developed by IEEE. By entering the name of the lLibrary and the statement use, all information in the lLibrary areis visible to the whole module. If we do not write the first two statements in Listing 4.5, thewe can not use standard_logic type cannot be used. Libraries can also be generated by the user. The HDL simulator generates a lLibrary by the named of “work” every time it compiles HDL code. This lLibrary can be bound to another module by using the statement use, as follows:
+      
+       use entity work.gates (or_gates);
+      
+      The entity to be bound to the module is “gates”; gates has an architecture by the name of “or_gates”; and all information in this architecture is visible to the module wherever the use statement is written. Listing 4.6 shows an example of binding architecture in one module to a component written in another module.
+      
+Listing 4.6?Binding bBetween a Library Work and a Component in VHDL
+      
+       --First, we write the code that will be bound to another module
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity bind2 is
+       port (I1, I2 : in std_logic; O1 : out std_logic);
+       end bind2;
+       
+       architecture xor2_0 of bind2 is
+       begin
+           O1 <= I1 xor I2;
+       end xor2_0;
+       
+       architecture and2_0 of bind2 is
+       begin
+           O1 <= I1 and I2;
+       end and2_0;
+       
+       architecture and2_4 of bind2 is
+       begin
+           O1 <= I1 and I2 after 4 ns;
+       end and2_4;
+       
+       --After writing the above code; we compile it and store it in a known
+           --location. Now, open another module
+       --Now open another module where you want to use the above information is to be used.
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+           entity half_add is
+           port (a, b : in std_logic; S, C : out std_logic);
+           end half_add;
+       
+           architecture HA_str of half_add is
+           component xor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+           end component;
+           component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+           end component;
+           for all : xor2 use entity work.bind2 (xor2_0);
+           for all : and2 use entity work.bind2 (and2_4);
+           begin
+           X1 : xor2 port map (a, b, S);
+           A1 : and2 port map (a, b, C);
+           end HA_str;
+      
+      The statementt: for all : xor2 use entity work.bind2 (xor2_0) binds the architecture xor2_0 of the entity bind2 to the component xor2. By this binding, component xor2 behaves as a 2two-input XOR gate with zero propagation delay. The statement: for all : and2 use entity work.bind2 (and2_4) binds the architecture and2_4 of the entity bind2 to the component and2. By this binding, component and2 behaves as a 2two-input ANDand gate with a 4- nsec propagation delay time. In Listing 4.6, it is assumed that both entities bind2 and half_add have the same path (stored in the same directory), otherwise the path of the lLibrary work has to be entered.
+       Throughout this cChapter we adopt the binding shown in Listing 4.6 is adopted. TWe write the codes for all the gates that we expected are written to use, and compile the module is compiled, and stored it. Whenever we want to use any component from the stored module, we bind it to the current module. Listing 4.28 includesshows the VHDL binding code used infor binding for of the all Examples covered in this Cchapter.
+      As previously mentioned, In Verilog has, as mentioned before, all primitive gates are built -in and ready to use. We can bind modules by just writing the name of the module to be bound. Listing 4.7 shows such binding.
+      
+Listing 4.7?Binding bBetween tTwo Modules in Verilog
+      
+       module one ( O1, O2, a, b);
+           input [1:0] a;
+           input [1:0] b;
+           output [1:0] O1, O2;
+       
+       two M0 (O1[0], O2[0], a[0], b[0]);
+       two M1 (O1[1], O2[1], a[1], b[1]);
+       endmodule
+       
+       module two (s1, s2, a1, b1);
+           input a1;
+           input b1;
+           output s1, s2;
+       xor (s1, a1, b1);
+       and (s2, a1, b1);
+       endmodule
+      
+      The statement: two M0 (O1 [0], O2 [0], a [0], b [0]); written in module “one” binds module “two” to module “one”. Accordingly, the relationship between O1, O2, a, and b is as follows:
+      
+       O1 [0] is the output of a 2two-input XORxor gate with a [0] and b [0] as the inputs.
+       O2 [1] is the output of a 2two-input ANDand gate with a [1] and b [1] as the inputs.
+      
+      Other methods of binding are discussed in Chapter 6, “Procedures, Tasks, and Functions,” and in Chapter 8, “Advanced HDL Descriptions.” TIn the following we cover several eExamples will enableto practice in usingwith binding and structural descriptions.
+      
+Example 4.2?Structural Description of a 2x1 Multiplexer with aActive lLow eEnable
+The truth table and logic diagram of this multiplexer have been covered in Chapter 2, “Data Flow Description.” We redraw tThe logic diagram is redrawn here for convenience, (see Figure 4.2).
+      
+      *** Insert Figure 4.2 (Figure 24.42) here***
+      [COMP: Figure 4.2 is the same as Figure 2.4]
+Figure 4.2?(same as Figure 2.4) 2x1 Multiplexer. (a) Logic diagram. (b) Logic symbol.
+      
+      From Figure 4.2, we see that the components of the multiplexer are: two 3three-input ANDand gates, three inverters, and one 2two-input orOR gate. Each gate, including the inverter, is assumed to have a 7- nsec propagation delay time. For the VHDL, we adopt the binding method shown in Listing 4.6. First, we write a code to describe these gates;, it is compiled it, and then then stored it. We include here sSome other gates are included here that we may usemight be used for other eExamples. Listing 4.8 shows the code for several gates.
+       
+Listing 4.8?VHDL Code for Several Gates
+      
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity bind1 is
+       port (I1 : in std_logic; O1 : out std_logic);
+       end bind1;
+       architecture inv_0 of bind1 is
+       begin
+       O1 <= not I1; -- This is an inverter with zero delay
+       end inv_0;
+       
+       architecture inv_7 of bind1 is
+       begin
+       O1 <= not I1 after 7 ns; --This is an inverter with a 7-nsec delay
+       end inv_7;
+       
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity bind2 is
+       port (I1, I2 : in std_logic; O1 : out std_logic);
+       end bind2;
+       
+       architecture xor2_0 of bind2 is
+       begin
+       O1 <= I1 xor I2; --This is exclusive-or with zero delay.
+       end xor2_0;
+       
+       architecture and2_0 of bind2 is
+       begin
+       O1 <= I1 and I2; --This is a 2two -input and gate with zero delay.
+       end and2_0;
+       
+       architecture and2_7 of bind2 is
+       begin
+       O1 <= I1 and I2 after 7 ns; -- This is a2 two -input and gate
+                                   -- with 7- nsec delay.
+       end and2_7;
+       
+       architecture or2_0 of bind2 is
+       begin
+       O1 <= I1 or I2; -- This is 2a two -input or gate with zero delay.
+       end or2_0;
+       
+       architecture or2_7 of bind2 is
+       begin
+       O1 <= I1 or I2 after 7 ns; -- This is a two 2-input or gate
+                                  -- with 7- nsec delay.
+       end or2_7;
+       
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity bind3 is
+       port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end bind3;
+       
+       architecture and3_0 of bind3 is
+       begin
+       O1 <= I1 and I2 and I3; -- This is a three  3-input and gate
+                               -- with zero delay.
+       end and3_0;
+       
+       architecture and3_7 of bind3 is
+       begin
+       O1 <= I1 and I2 and I3 after 7 ns; --This is a three 3-input
+                                          -- and gate with 7- nsec
+                                          --delay.
+       end and3_7;
+       
+       architecture or3_0 of bind3 is
+       begin
+       O1 <= I1 or I2 or I3; --This is a three3 -input or gate
+                             -- with zero delay.
+       end or3_0;
+       
+       architecture or3_7 of bind3 is
+       begin
+       O1 <= I1 or I2 or I3 after 7 ns; --This is a three3 -input or gate
+                                        -- with 7- ns ec
+        --delay.
+       end or3_7;
+      
+      After we compile the above code, we store it in a known directory (path). AWe start a new module is started to write the code for the multiplexer. Listing 4.9 shows the HDL code for a 2x1 multiplexer with active low enable.
+      
+Listing 4.9?HDL Description of a 2x1 Multiplexer with Active L-low Enable—VHDL and Verilog.
+      
+      a) VHDL. b) Verilog.
+      ***Begin Listing***
+      VHDL 2x1 Multiplexer with Active Low EnableDescription
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity mux2x1 is
+           port (A, B, SEL, Gbar : in std_logic;
+               Y : out std_logic);
+           end mux2x1;
+       
+       architecture mux_str of mux2x1 is
+       
+           --Start Components Declaration
+           component and3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       --OWe need to declare only different types of components need be declared.
+       --Since the multiplexer has two identical AND gates,
+       --only one iswe declared only one.
+       
+       component or2
+       port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component Inv
+       port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       signal S1, S2, S3, S4, S5 : std_logic;
+       for all : and3 use entity work.bind3 (and3_7);
+       for all : Inv use entity work.bind1 (inv_7);
+       for Or1 : or2 use entity work.bind2 (or2_7);
+       begin
+           --Start instantiation
+       A1 : and3 port map (A,S2, S1, S4);
+       A2 : and3 port map (B,S3, S1, S5);
+       IV1 : Inv port map (SEL, S2);
+       IV2 : Inv port map (Gbar, S1);
+       IV3 : Inv port map (S2, S3);
+       or1 : or2 port map (S4, S5, Y);
+       end mux_str;
+      
+      ***Begin Verilog***
+      b) Verilog 2x1 Multiplexer with Active Low EnableDescription
+       module mux2x1 (A, B, SEL, Gbar, Y);
+       input A, B, SEL, Gbar;
+       output Y;
+       and #7 (S4, A, S2, S1);
+       or #7 (Y, S4, S5);
+       and #7 (S5, B, S3, S1);
+       not #7 (S2, SEL);
+       not #7 (S3, S2);
+       not #7 (S1, Gbar);
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+      Referring to Listing 4.9, since the multiplexer has two identical ANDand gates (both 3three-input and gates), we declare only one of them in the VHDL description by the statements:
+      
+       component and3
+       port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+      
+      Similarly, We do the same and declare only one inverter is declared. If the two ANDand gates do not have the same delay time—, say, one of them A1 has 0 nsec and the other A2 has 7 nsec—, then instead of “all” in the use statement, we write:
+      
+       for A1 : and3 use entity work.bind3 (and3_0);
+       for A2 : and3 use entity work.bind3 (and3_7);
+      
+      For the Verilog description, the statement:
+      
+       and #7 (S4, A, S2, S1);
+      
+is declaresing a three-input (A, s2, s1) ANDand gate with propagation delay of 7seven simulation screen units. Note that we do not need to declare s2 or s1 do not need to be declared as wire; the Verilog assumes that they are of the same type as A. If a fourwe need to use 4 -input and gate are needed, we write
+      
+       and (o1, in1, in2, in3, in4)
+      
+where O1 is the output, and in1, in2, in3, and in4 are the inputs. We can give a name to the gates in Verilog, as:
+      
+       or #7 orgate1 (O1, in1, in2)
+      
+      The above statement describes an OR gate by the name of “orgate1”; it has two inputs (in1, in2) and an output ( O1). The name is optional and can be omitted.
+      The simulation waveform of the multiplexer is identical to that of Figure 2.5.
+      
+Example 4.3?Structural Description of a 2x4 Decoder with Three3-sState Output
+A decoder is a combinational circuit. A 2x4 decoder has two inputs and four outputs. For any input, only one output is active; all others are inactive. For an active-high output decoder,; only one output is high. The output can be deactivated or put in high impedance if the decoder has enable. For a tri-state output, if the enable is inactive, then all the outputs are in high impedance.     The output of an n-bit input decoder is 2n bits. Table 4.1 shows the truth table of the decoder.
+      
+Table 4.1?Truth Table for a 2x4 Decoder with tTri-sState Outputs
+      
+      ***Begin Table [COMP: Inputs straddles first three columns; Outputs straddles last four columns.]***
+      
+      Inputs			Outputs
+      Enable	I1	I2	D3	D2	D1	D0
+      0	x	x	Z	Z	Z	Z
+      1	0	0	0	0	0	1
+      1	0	1	0	0	1	0
+      1	1	0	0	1	0	0
+      1	1	1	1	0	0	0
+      ***End Table***
+      
+      We use tTri-state buffers are used at the output. If the enable is low, then all outputs are in high impedance (Z). From Table 4.1, we can write the Boolean function of the outputs.
+      
+	D0 =  
+	D1 = I0 
+	D2 =  I1
+	D3 = I0 I1
+      
+      Figure 4.3 shows the logic diagram of the decoder.
+      
+      *** Insert Figure 4.3 here***
+Figure 4.3?Logic diagram of a 2x4 Decoder with 3tri-state Ooutput.
+      
+      To write the VHDL code, we need first to write a description of athe tri-state buffer gate. The easiest description type that we can be written for the tri-state buffer is behavioral, using the if statement. TWe attach this description is attached to the entity bind2 (seeof Listing 4.8). Listing 4.10 shows a behavioral description of a tri-state buffer. The Verilog has built-in buffers (see; Figure 4.4) shows such buffers.
+      
+      *** Insert Figure 4.4 here***
+Figure 4.4?Verilog bBuilt-in bBuffers.
+      
+Listing 4.10?VHDL Behavioral Description of a tTri-sState Buffer
+      
+       entity bind2 is
+       port (I1, I2 : in std_logic; O1 : out std_logic);
+       end bind2;
+       ...........
+       --aAdd the following architecture to
+       -- tthe entity bind2 of Listing 4.8
+       architecture bufif1 of bind2 is
+       begin
+       buf : process (I1, I2)
+       variable tem : std_logic;
+       begin
+       if (I2 ='1') then
+       tem := I1;
+       else
+       tem := 'Z';
+       end if;
+       O1 <= tem;
+       end process buf;
+       end bufif1;
+      
+      Now we write the HDL structural description of the decoder as shown in. Listing 4.11 shows the HDL structural description of the decoder.
+      
+Listing 4.11?HDL Description of a 2x4 Decoder with tTri-sState Output—. a) VHDL and . b) Verilog.
+      
+      
+      ***Begin Listing ***
+      a) VHDL 2x4 Decoder with Tri-State OutputDescription
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity decoder2x4 is
+           port (I : in std_logic_vector(1 downto 0); Enable : in std_logic; D : out std_logic_vector (3 downto 0));
+       [AU: Please re-break line above. Is too long.]
+       end decoder2x4;
+       
+       architecture decoder of decoder2x4 is
+       component bufif1
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : bufif1 use entity work.bind2 (bufif1);
+       for all : inv use entity work.bind1 (inv_0 );
+       for all : and2 use entity work.bind2 (and2_0 );
+       signal s0, s1, s2, s3 : std_logic;
+       signal Ibar : std_logic_vector (1 downto 0);
+       -- The above signals have to be declared before they can be used
+       begin
+           B0 : bufif1 port map (s0, Enable, D(0));
+           B1 : bufif1 port map (s1, Enable, D(1));
+           B2 : bufif1 port map (s2, Enable, D(2));
+           B3 : bufif1 port map (s3, Enable, D(3));
+           iv0 : inv port map (I(0), Ibar(0));
+           iv1 : inv port map (I(1), Ibar(1));
+           a0 : and2 port map (Ibar(0), Ibar(1), s0);
+           a1 : and2 port map (I(0), Ibar(1), s1);
+           a2 : and2 port map (Ibar(0), I(1), s2);
+           a3 : and2 port map (I(0), I(1), s3);
+       end decoder;
+      
+      ***Begin Verilog***
+      b) Verilog 2x4 Decoder with Tri-State OutputDescription
+       module decoder2x4 (I, Enable, D);
+       input [1:0] I;
+       input Enable;
+       output [3:0] D;
+       wire [1:0] Ibar;
+           bufif1 (D[0], s0, Enable);
+           bufif1 (D[1], s1, Enable);
+           bufif1 (D[2], s2, Enable);
+           bufif1 (D[3], s3, Enable);
+           not (Ibar[0], I[0]);
+           not (Ibar[1], I[1]);
+           and (s0, Ibar[0], Ibar[1]);
+           and (s1, I[0], Ibar[1]);
+           and (s2, Ibar[0], I[1]);
+           and (s3, I[0], I[1]);
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+      Figure 4.5 shows the simulation waveform of the decoder.
+      
+      *** Insert Figure 4.5 here***
+Figure 4.5?Simulation waveform of a 2x1 decoder with tri-state output.
+      
+Example 4.4?Structural Description of a Full Adder
+In this example, awe build the full adder (Listing 4.13) is built from two half adders (Listing 4.12). The fFull adder adds (a + b + cin) to give sum and carry. Half adder is used toWe can add (a + b), using half adder to give sum1 and carry1;. we use aAnother half adder is used to add (sum1 + cin), to give sum and carry2. The carry of the summation of (a + b + cin) is the logical ORor of carry1 and carry2. Figures 4.6a and 4.6b shows the logical symbol and diagram of this full adder, respectively.
+      
+      *** Insert Figures 4.6a and 4.6b here***
+Figure 4.6?Full aAdder as two Hhalf aAdders. a) Logic symbol. b) Logic diagram.
+      [AU: In Figure 4.6a, can we move the “sum” off of the line? Thanks.][done]
+      
+      For the VHDL code, we first write the code for half adder. We include this code in Listing 4.8.; Listing 4.12 shows the code of the half adder as part of Listing 4.8.
+      
+Listing 4.12?VHDL Code for the Half Adder
+      
+       --This code is to be appended to Listing 4.8
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity bind22 is
+           Port ( I1, I2 : in std_logic; O1, O2 : out std_logic);
+       end bind22;
+       
+       architecture HA of bind22 is
+       component xor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       for A1 : and2 use entity work.bind2 (and2_0);
+       for X1 : xor2 use entity work.bind2 (xor2_0);
+       begin
+           X1 : xor2 port map (I1, I2, O1);
+           A1 : and2 port map (I1, I2, O2);
+       end HA;
+      
+      Now we write the structural description of the full adder as two half adders. Listing 4.13 shows the HDL code for a full adder.
+      
+Listing 4.13?HDL Description of a Full Adder (Figures 4.56a and 4.6b)—. a) VHDL and . b) Verilog .
+      
+      ***Begin Listing**
+      a) VHDL Full Adder Description
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity FULL_ADDER is
+           Port ( x, y, cin : in std_logic; sum, carry : out std_logic);
+       end FULL_ADDER;
+       architecture full_add of FULL_ADDER is
+       component HA
+           Port ( I1, I2 : in std_logic; O1, O2 : out std_logic);
+       end component;
+       component or2
+           Port ( I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       for all : HA use entity work.bind22 (HA);
+       for all : or2 use entity work.bind2 (or2_0);
+       signal s0, c0, c1 : std_logic;
+       
+       begin
+           HA1 : HA port map (y, cin, s0, c0);
+           HA2 : HA port map (x, s0, sum, c1);
+           r1 : or2 port map (c0, c1, carry);
+       end full_add;
+      
+      ***Begin Verilog***
+      b) Verilog Full Adder Description
+       module FULL_ADDER (x, y, cin, sum, carry);
+       input x, y, cin;
+       output sum, carry;
+       HA H1 (y, cin, s0, c0);
+       HA H2 (x, s0, sum, c1);
+       //The above two statements bind module HA
+       // to the present module FULL_ADDER
+       or (carry, c0, c1);
+       endmodule
+       
+       
+       module HA (a, b, s, c);
+       input a, b;
+       output s, c;
+       xor (s, a, b);
+       and (c, a, b);
+       endmodule
+      
+      To use the above VHDL code in future examples, it is we appended it to entity bind32 in Listing 4.28.
+      
+Example 4.5?Structural Description of an SR Latch
+An SR (Set(S)-Reset(R) latch is a sequential circuit. It memorizes one of its state when S = R = 0. Memorization is achieved through a feedback between the outputs Q and its complement, and the inputs. The inputs receive the values of the current outputs through the feedback lines. The state where S = R = 1 is prohibited, since it may lead to unstable output (both Q and  acquire the same logic level). The latch is implemented in digital systems as a switch or as a memory cell for sStatic rRandom-A access mMemoryies (SRAMs). The excitation table of the latch is shown in Table 4.2.
+      
+Table 4.2?Excitation Table of an SR Latch
+      
+      ***Begin Table***
+      
+      S	R	Current State	Next State
+      1	0	     x	     1
+      0	1	     x	     0
+      0	0	     q	     q
+      1	1	     x	     prohibited
+      ***End Table***
+      
+      Figures 4.7a and 4.7b shows the logic symbol and diagram and symbol, respectively, of an SR latch using NOR gates. Notice the connection (feedback) between the output Q and the input of NOR gate in Figure 4.7b.
+      
+      *** Insert Figure 4.7 here***
+Figure 4.7?SR Latch. a) Logic symbol. b) Logic diagram.
+      
+      Listing 4.14 shows the HDL structural description of an SR latch based on NOR gates.
+       
+Listing 4.14?HDL Description of an SR Latch with NOR Gates
+      
+      ***Begin Listing***
+      VHDL SR Latch with NOR GatesDescription
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity SR_latch is
+       port (R, S : in std_logic;
+           Q, Qbar : buffer std_logic);
+       
+       --Q, Qbar are declared buffer because
+       -- they behave as input and output.
+       
+       end SR_latch;
+       
+       architecture SR_strc of SR_latch is
+       --Some simulators would not allow mapping between
+       -- buffer and out. In this
+       -- case, change all out to buffer.
+       component nor2
+       port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : nor2 use entity work.bind2 (nor2_0);
+       begin
+           n1 : nor2 port map (S, Q, Qbar);
+           n2 : nor2 port map (R, Qbar, Q);
+       end SR_strc;
+      
+      ***Begin Verilog***
+      Verilog SR Latch with NOR GatesDescription
+       module SR_Latch (R, S, Q, Qbar);
+       input R, S;
+       output Q, Qbar;
+       nor (Qbar, S,Q);
+       nor (Q, R, Qbar);
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+To use the above code in future eExamples, we append it is appended to Listing 4.28.  Figure 4.8 shows the simulation waveform of the SR latch.
+
+      *** Insert Figure 4.8 here***
+Figure 4.8?Simulation waveform of an SR latch.
+      [AU: Figure 4.8 needs to be called out somewhere in the text above.][done]
+      
+Example 4.6?Structural Description of a Delay Latch (D -Latch)
+A D- latch (Delay latch) is a sequential circuit. The output of the latch (Q) follows the input (D) as long as the eEnable (E) is high.  is the complement of Q. The latch has been discussed in Chapter 2, “Data Flow Descriptions.”. The logic symbol and logic diagrams are as shown in Figure 2.8 and 2.10, respectively. Listing 4.15 shows the HDL structural description of a D- latch.
+      
+Listing 4.15?HDL Description of a D- Latch—. a) VHDL and . b) Verilog.
+      
+      ***Begin Listing***
+      a) VHDL D-Latch Description
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity D_Latch is
+           port ( D, E : in std_logic; Q, Qbar : buffer std_logic);
+       end D_Latch;
+       
+       architecture D_latch_str of D_Latch is
+       --Some simulators willould not allow mapping between
+       -- buffer and out. In this
+       -- case, change all out to buffer.
+       
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component nor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : and2 use entity work.bind2 (and2_4);
+       for all : nor2 use entity work.bind2 (nor2_4);
+       for all : inv use entity work.bind1 (inv_1);
+       signal Eb, s1, s2 : std_logic;
+       begin
+           a1 : and2 port map (D, E, s1);
+           a2 : and2 port map (Eb, Q, s2);
+           in1 : inv port map (E, Eb);
+           in2 : inv port map (Qbar, Q);
+           n2 : nor2 port map (s1, s2, Qbar);
+           end D_latch_str;
+      
+      To use the above code in future eExamples, we append it is appended to Listing 4.28.
+      
+      ***Begin Verilog***
+      b) Verilog D-Latch Description
+       module D_latch (D, E, Q, Qbar);
+       input D, E;
+       output Q, Qbar;
+       /* assume 4 ns delay for and gate and nor gate,
+           and 1 ns for inverter */
+       
+       and #4 gate1 (s1, D, E);
+       
+       /* the name "gate1" is optional; we could have
+           written and #4 (s1, D, E) */
+       
+           and #4 gate2 (s2, Eb, Q);
+           not #1 (Eb, E);
+           nor #4 (Qbar, s1, s2);
+           not #1 (Q, Qbar);
+       endmodule
+      
+      The simulation waveform is the same as in Figure 2.110.
+      
+Example 4.7?Structural Description of a Pulse-Triggered, Master-Slave D Flip-Flop
+The D- latch discussed in Listing 4.15 has a characteristic that may not be desirableed in digital circuits such as counters. The D- latch output follows its input as long as the enable is high. In counters, for example, we may like to have the output changes only once during the active phase of the clock. To achieve this, we need flip- flops.
+       A Mmaster-Sslave D flip-flop is a sequential circuit where the output follows the input only once at the transition of the clock from inactive to active. Figure 4.9 shows the logic symbol of the master-slave D flip-flop. Table 4.3 shows the eExcitation tTable of the flip-flop.
+      
+      *** Insert Figure 4.9 here***
+Figure 4.9?Logic symbol of the master-slave D flip-flop.
+      
+Table 4.3?Excitation Table for the Master-Slave D Flip-Flop
+      
+      ***Begin Table***
+      Input	cCurrent saState	cClock	Next sState
+      D	Q	clk	Q+
+      0	0		0
+      0	1		0
+      1	0		1
+      1	1		1
+      ***End Table***
+      
+      The logic diagram of the master-slave flip-flop is shown in Figure 4.10. The flip- flop consists of two active-high enable D-latches; the first latch is called the “master,” and the second is called the “other slave.” The master latch drives the slave. The clock of the master is the invert of the clock of the slave. Since the clock of one of the latches is the invert of the other, at any time, one latch is active while the other is inactive. At the high level of the clock, the slave is active; its output Q follows its input QM (QM is the output of the master). Since the master is inactive at the high level of the clock, any change in D (the input of the slave) is not transmitted to QM; so QM and Q stay the same during the high level of the clock, unaffected by any change in D. Thus, the flip- flop is sensitive to the clock pulse rather than the level, as in a D- latch.
+      
+      *** Insert Figure 4.10 here***
+Figure 4.10?lLogic diagram of a master-slave D flip-flop.
+      
+      Listing 4.16 shows the HDL code of the Mmaster-slave D flip-flop. In the VHDL code, there is we already have a code for the D- latch (see Listing 4.15); we attach this code is attached to the flip-flop to the code of the flip flop and utilize it. This is done by the statement:
+      
+       for all : D_latch use entity work.bind22 (D_latch);
+      
+which links the architecture D_latch to the current module. In Verilog, we link the module D_latch to the module D_FFMaster by the statement:
+      
+       D_latch D0 (D, clkb, Q0, Qb0);
+      
+      Note that the order of the linked parameters (D, clkb, Q0, Qb0) has to match D, E, Q, and Qbar of the D_latch module, respectively.
+      
+Listing 4.16?HDL Description of a Master-Slave D- Flip-Flop—. a) VHDL and . b) Verilog.
+      
+      ***Begin Listing***
+      a) VHDL Master-Slave D Flip-FlopDescription
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity D_FFMaster is
+           Port (D, clk : in std_logic; Q, Qbar : buffer std_logic);
+       end D_FFMaster;
+       
+       architecture D_FF of D_FFMaster is
+       --Some simulators would not allow mapping between
+       -- buffer and out. In this
+       -- case, change all out to buffer.
+       
+       component inv
+           port ( I1 : in std_logic; O1 : out std_logic);
+       end component;
+       component D_latch
+           port (I1, I2 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       for all : D_latch use entity work.bind22 (D_latch);
+       for all : inv use entity work.bind1 (inv_1);
+       signal clkb, clk2, Q0, Qb0 : std_logic;
+       begin
+           D0 : D_latch port map (D, clkb, Q0, Qb0);
+           D1 : D_latch port map (Q0, clk2, Q, Qbar);
+           in1 : inv port map (clk, clkb);
+           in2 : inv port map (clkb, clk2);
+       end D_FF;
+      
+      ***Begin Verilog***
+      b) Verilog Master-Slave D Flip-FlopDescription
+       module D_FFMaster (D, clk, Q, Qbar);
+       input D, clk;
+       output Q, Qbar;
+           not #1 (clkb, clk);
+           not #1 (clk2, clkb);
+           D_latch D0 (D, clkb, Q0, Qb0);
+           D_latch D1 (Q0, clk2, Q, Qbar);
+       endmodule
+       
+       
+       module D_latch (D, E, Q, Qbar);
+       input D, E;
+       output Q, Qbar;
+           and #4 gate1 (s1, D, E);
+           and #4 gate2 (s2, Eb, Q);
+           not #1 (Eb, E);
+           nor #4 (Qbar, s1, s2);
+           not #1 (Q, Qbar);
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+      To use the above VHDL code in future eExamples, it is we appended it to entity bind22 in Listing 4.28. [AU: Do you mean listing 4.12? There is no bind22 in Listing 4.8 (just a bind2).][it is Listing 4.28 instead of 4.8] Listing 4.28 shows the code that has been used in all eExamples of Chapter 4.
+      
+      Figure 4.11 shows the simulation waveform of the master-slave D flip-flop. It is clear from the figure that, signal D is sampled only at the transition of the clock from low to high. If D changes during the high level (or the low level) of the clock, the output Q remains the same; it does not respond to this change. Compare Figure 4.11 with Figure 2.11, and notice the difference between a latch and a flip-flop. During the high level of the clock (called eEnable in the latch), Q follows D for the latch. ; iIn the flip-flop, Q follows D only at the clock transition from low to high.
+      
+      *** Insert Figure 4.11 here***
+Figure 4.11?Simulation waveform of a master-slave D flip-flop.
+      
+Example 4.8?Structural Description of a Pulse-Triggered Master-Slave JK Flip-Flop
+A JK flip-flop can be viewed as an extension of the SR- latch. The flip- flop has all the allowed states of the SR. The prohibited state in the SR- latch is replaced by a toggle state, where the output of the flip- flop is complemented every time J = K = 1. Table 4.4 shows the excitation table of a pulse- triggered JK flip- flop.
+      
+Table 4.4?Excitation Table for a Pulse -Triggered JK D Flip-Flop
+      
+      ***Begin Table***
+      [AU: Table headings missing here.]
+      J	K	Q	clk	Q+
+      0	0	Q0		Q0
+      0	1	x		0
+      1	0	x		1
+      1	1	Q0		
+      ***End Table***
+      
+      We can derive tThe Boolean function of a JK flip -flop can be derived from that of D flip- flop. Table 4.5 shows the J and K values, and the corresponding D values.
+      
+Table 4.5?Relationship between JK fFlip-f Flop and D Fflip-f Flop.
+      
+      ***Begin Table***
+      [AU: Table headings missing.]
+      J	K	Q	clk	Q+	D
+      0	0	0		0	0
+      0	0	1		1	1
+      0	1	0		0	0
+      0	1	1		0	0
+      1	0	0		1	1
+      1	0	1		1	1
+      1	1	0		1	1
+      1	1	1		0	0
+      ***End Table***
+      
+      To find the Boolean function of D,  we form K-maps as shown in Figure 4.12.
+      
+      *** Insert Figure 4.12 here***
+Figure 4.12?K-maps of Table 4.5.
+      
+      From Figure 4.12, the Boolean functions are:
+      
+	D =  Q + J 	(4.1)
+      
+      We use Equation 4.1 is used to generate a master-slave JK flip-flop from a master-slave D flip-flop. Figure 4.13 shows a JK master-slave flip-flop generated from a master-slave D flip-flop (see Figure 4.10).
+      
+      *** Insert Figure 4.13 here***
+Figure 4.13?Pulse-t Triggered Mmaster-Sslave JK Fflip-Fflop.
+      
+      Listing 4.17 shows the HDL code ofor the Mmaster-sSlave JK fFlip-fFlop illustrated in (Figure 4.13).
+      
+Listing 4.17?HDL Description of a Master-Slave JK Flip-Flop—. a) VHDL and . b) Verilog.
+      
+      ***Begin Listing***
+      a) VHDL Master-Slave JK Flip-FlopDescription
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity JK_FF is
+       port (J, K, clk : in std_logic; Q, Qbar : buffer std_logic);
+       
+       -- Q and Qbar are declared buffer so they can be input or output
+       
+       end JK_FF;
+       
+       architecture JK_Master of JK_FF is
+       --Some simulators willould not allow mapping between
+       -- buffer and out. In this
+       -- case, change all out to buffer.
+       
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component or2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       component D_flip
+           port (I1, I2 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       for all : and2 use entity work.bind2 (and2_4);
+       for all : or2 use entity work.bind2 (or2_4);
+       for all : inv use entity work.bind1 (inv_1);
+       for all : D_flip use entity work.bind22 (D_FFMaster);
+       signal s1, s2, Kb, DD : std_logic;
+       begin
+           a1 : and2 port map (J, Qbar, s1);
+           a2 : and2 port map (Kb, Q, s2);
+           in1 : inv port map (K, Kb);
+           or1 : or2 port map (s1, s2, DD);
+           DFF : D_flip port map (DD, clk, Q, Qbar);
+       end JK_Master ;
+      
+      ***Begin Verilog***
+      b) Verilog Master-Slave JK Flip-FlopDescription
+       module JK_FF (J, K, clk, Q, Qbar);
+       input J, K, clk;
+       output Q, Qbar;
+       wire s1, s2;
+           and #4 (s1, J, Qbar);
+           and #4 (s2, Kb, Q);
+           not #1 (Kb, K);
+           or #4 (DD, s1, s2);
+           D_FFMaster D0 (DD, clk, Q, Qbar);
+       endmodule
+       
+       module D_FFMaster (D, clk, Q, Qbar);
+       
+       /* We do not have to rewrite the module if the simulator
+            that you used can attach it to the above module (JK_FF). */
+       
+       
+       input D, clk;
+       output Q, Qbar;
+       wire clkb, clk2, Q0, Qb0;
+       not #1 (clkb, clk);
+       not #1 (clk2, clkb);
+       D_latch D0 (D, clkb, Q0, Qb0);
+       D_latch D1 (Q0, clk2, Q, Qbar);
+       endmodule
+       
+       
+       module D_latch (D, E, Q, Qbar);
+       input D, E;
+       output Q, Qbar;
+       wire Eb, s1, s2;
+       //assume 4- ns delay for and gate and nor gate,
+       // and 1 ns for inverter
+       
+       and #4 gate1 (s1, D, E);
+       //T the name gate1 is optional and could have been omitted.
+       
+           and (s1, D, E);
+           and #4 gate2 (s2, Eb, Q);
+           not #1 (Eb, E);
+           nor #4 (Qbar, s1, s2);
+           not #1 (Q, Qbar);
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+      NWe notice here that the VHDL code in Listing 4.17 is gettinggetting  shorterer [the VHDL code is not shorter but getting shorter]  in compared toison with the Verilog code. This is due to the facts that we are linking VHDL user-built components are being linked, such as and2, or2, and inv.; Twe do not need to rewrite their codes do not need to be rewritten because they are linked here since we are linking it to the current module.
+      
+Example 4.9?Structural Description of a 3-bit Ripple Carry Adder
+In this Example, we describe a 3-bit ripple carry adder is described. Then in EIn the next example 4.10, , we implement this adder to build a magnitude comparator. The logic diagram of theis adder is as shown in Figure 2.13 of (Chapter 2, “Data Flow Description”). Listing 4.18 shows the structural description of athe 3-bit ripple carry adder.
+      
+Listing 4.18?HDL Description of a 3-bBit Ripple Carry Adder—. a) VHDL and . b) Verilog.
+      
+      ***Begin Listing***
+      a)VHDL 3-Bit Ripple Carry AdderDescription
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity three_bit_adder is
+       port( x, y : in std_logic_vector (2 downto 0);
+           cin : in std_logic; sum : out std_logic_vector (2 downto 0);
+           cout : out std_logic);
+       end three_bit_adder;
+       
+       architecture three_bitadd of three_bit_adder is
+       component full_adder
+       port (I1, I2, I3 : in std_logic; O1, O2 : out std_logic);
+       end component;
+       for all : full_adder use entity work.bind32 (full_add);
+       signal carry : std_logic_vector (1 downto 0);
+       begin
+           M0 : full_adder port map (x(0), y(0), cin, sum(0), carry (0));
+           M1 : full_adder port map (x(1), y(1), carry(0), sum(1), carry (1));
+           M2 : full_adder port map (x(2), y(2), carry(1), sum(2), cout);
+       end three_bitadd;
+      
+      ***Begin Verilog***
+      b)Verilog 3-Bit Ripple Carry AdderDescription
+       module three_bit_adder (x, y, cin, sum, cout);
+       input [2:0] x, y;
+       input cin;
+       output [2:0] sum;
+       output cout;
+       wire [1:0] carry;
+           FULL_ADDER M0 (x[0], y[0], cin, sum[0], carry[0]);
+           FULL_ADDER M1 (x[1], y[1], carry[0], sum[1], carry[1]);
+           FULL_ADDER M2 (x[2], y[2], carry[1], sum[2], cout);
+       
+       /* It is We are assumeding that the module FULL_ADDER
+            (Listing 4.13) is attached by the simulator to
+            the module three_bit_adder so, no need to
+            rewrite the module FULL_ADDER.*/
+       
+       endmodule
+      
+      Inspecting the code in Listing 4.18 and we notice that there may be lagging time between the steady state of each of the adders and the carry out (cout). This lagging time produces transient states before the values of the sum and carry out settle. For example, if the inputs to the adder are 101 and 001, and the previous output of the adder is 1001, some transient states can be 0100, and 1010 before the output settles at 0110;. tThe appearance of these transient states is called “hazards.” These transient states, however, have short duration and may not be noticed.
+      
+Example 4.10?Structural Description of a 3-bBit Magnitude Comparator uUsing a 3-bBit Adder
+In Chapter 2 covered “Data Flow Description” We covered a 2x2-bit comparison using truth tables. If the number of bits to be compared is more than two bits, the truth tables become so huge that is too difficult to handle. In this Example, here we take a different approach is taken. Given two numbers X and Y, each of n bits; if we assume X is greater than Y, then we have:
+      
+	X-Y > 0	(4.2)
+      
+      -–Y is the 2’twos complement of Y =  + 1; substituting in Equation (4.2), we rewrite the condition of X>Y is rewritten as:
+      
+	X +  + 1 >0	(4.3)
+      
+      Or, Equation we can rewrite (4.3 can be rewritten) as:
+      
+	X +  > -1	(4.4)
+      
+      For n bits, -–1 is 1n……..1111 , so Equation (4.4) can be rewritten as:
+      
+	X +  >     1n……..1111	(4.5)
+      
+      EquationRelation 4.5 states that if X is greater than Y, then the sum of X and  should be greater than 1n……..1111. If we use n adders are used to add X plus, then for X to be greater than Y, the n-bit sum should be greater than n one1’s; this can only happen if the n-bit adders have a final carry out of 1.      So, if we add X is added to  using n-bit adders, and found that the final carry out is 1, then it can bewe concluded that X > Y. If there is no final carry out, then X is ? Y. To check for equality, weit is noticed that if X = Y then:
+      
+	X +  = 1n……..1111	(4.6)
+      
+      In this Example, we consider n = 3 is being considered. Figure 4.14 shows the logic diagram of the comparator.
+      
+      *** Insert Figure 4.14 here***
+Figure 4.14?A fFull a Adder-bs Based Ccomparator.
+      
+      Listing 4.19 shows the HDL code for the comparator. TheWe already have written HDL code for a full adders has already been written (, see Listing 4.13). TheWe use these full adders as components (macros) are used in Listing 4.19. SWe write them as components; since they are identical, we declare only one generic full adder as:
+      
+       component full_adder
+       port(I1, I2, I3 : in std_logic; O1, O2 : out std_logic);
+       end component;
+      
+      To use these components, we link their work Library from Listing 4.13 as:
+      
+       for all : full_adder use entity work.bind32 (full_add); --VHDL
+      
+      or, in Verilog, we link the module that we built in Listing 4.13 as:
+      
+       FULL_ADDER M0 (X[0], Yb[0], 1'b0, sum[0], carry[0]); //Verilog
+      [AU: Okay?][ok]
+Listing 4.19?HDL Description of a 3-bBit Comparator uUsing Adders—. a) VHDL and . b) Verilog.
+      
+      ***Begin Listing***
+      a) VHDL 3-Bit Comparator Using AddersDescription
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity three_bit_cmpare is
+       port (X, Y : in std_logic_vector (2 downto 0);
+           xgty, xlty, xeqy : buffer std_logic);
+       end three_bit_cmpare;
+       
+       architecture cmpare of three_bit_cmpare is
+       
+       --Some simulators willould not allow mapping between
+       -- buffer and out. In this
+       -- case, change all out to buffer.
+       
+       component full_adder
+       [AU: Indent these ports? They are in the subsequent listings.]
+           port (I1, I2, I3 : in std_logic; O1, O2 : out std_logic);
+       end component;
+       component Inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       component nor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component and3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : full_adder use entity work.bind32 (full_add);
+       for all : Inv use entity work.bind1 (inv_0);
+       for all : nor2 use entity work.bind2 (nor2_0);
+       for all : and3 use entity work.bind3 (and3_7);
+           	-- To reduce hazards, an AND gate iswe
+           --implemented an and gate with a 7- nano seconds delay.
+       signal sum, Yb : std_logic_vector (2 downto 0);
+       signal carry : std_logic_vector (1 downto 0);
+       begin
+           in1 : inv port map (Y(0), Yb(0));
+           in2 : inv port map (Y(1), Yb(1));
+           in3 : inv port map (Y(2), Yb(2));
+           F0 : full_adder port map (X(0), Yb(0), '0', sum(0), carry(0));
+           F1 : full_adder port map (X(1), Yb(1), carry(0), 
+                                     sum(1), carry(1));
+       [AU: Please re-break line above. Is too long.]
+           F2 : full_adder port map (X(2), Yb(2), carry(1), 
+                                     sum(2), xgty);
+       [AU: Please re-break line above. Is too long.]
+       
+       --TWe could have linked the current module could have been linked to the 3-bit adders that we
+       --designed in Listing 4.18 instead of linking to
+       -- F0, F1, and F2, as weas doneid here.
+       
+           a1 : and3 port map (sum(0), sum(1), sum(2), xeqy);
+           n1 : nor2 port map (xeqy, xgty, xlty);
+       end cmpare;
+      
+      ***Begin Verilog***
+      b) Verilog 3-Bit Comparator Using AddersDescription
+       module three_bit_cmpare (X, Y, xgty, xlty, xeqy);
+       input [2:0] X, Y;
+       output xgty, xlty, xeqy;
+       wire [1:0] carry;
+       wire [2:0] sum, Yb;
+           not (Yb[0], Y[0]);
+           not (Yb[1], Y[1]);
+           not (Yb[2], Y[2]);
+           FULL_ADDER M0 (X[0], Yb[0], 1'b0, sum[0], carry[0]);
+           FULL_ADDER M1 (X[1], Yb[1], carry[0], sum[1], carry[1]);
+           FULL_ADDER M2 ( X[2], Yb[2], carry[1], sum[2], xgty);
+       
+       /* We could have linked tThe current module could have been linked to the
+            3-bit adders that we
+       designed in Listing 4.18 instead of
+            linking to F0, F1, and F2, as weas didone here.*/
+       
+           and #7 (xeqy, sum[0], sum[1], sum[2]);	
+       
+       /* To reduce hazard we use an ANDand gate with a delay of 7 units*/
+       
+           nor (xlty, xeqy, xgty);
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+Example 4.11?Structural Description of an Static Random Access Memory SRAM Cell
+AWe design a simple memory cell has been designed using an SR- latch, but.    We could have used any other latches, such as a D- latches. The cell has tri-state output. If select line (Sel) is low, the output of the cell is in high impedance. A Read/Write (R/W) input signal controls the cell’s cycle type of cycle of the cell. If R/W is high, the cell is in read cycle; if low, the cell is in write cycle. Table 4.6 shows the excitation table of the cell, with. We construct the excitation table which shows the inputs (Select, R/W, Data-_Iin, Current State) and the corresponding outputs (Next sState, Output). From the current state and next state, we determine S and R of the latch according to Table 4.2. For example, if the current state is 0 and next state 0, then two combinations of SR can generate this transition:, S = 0, R = 0, and S = 0, R = 1;, so SR = 0x whenre x is “don’t care.”
+      
+Table 4.6?Excitation Table of an SRAM mMemory cCell [AU: Okay? There are all kinds of memory (e.g., DRAM).]
+      
+      ***Begin Table [COMP: Latch straddles columns S and R]***
+Select	R/W	Data-in	Current State	Next State	 Output	Latch
+Sel	RW	Din	Q	Q+	O1	S	R
+0	x	x	Q	Q	Z	0	0
+1	0	0	0	0	0	0	x
+1	0	0	1	0	0	0	1
+1	0	1	0	1	1	1	0
+1	0	1	1	1	1	x	0
+1	1	0	0	0	0	0	x
+1	1	0	1	1	1	x	0
+1	1	1	0	0	0	0	x
+1	1	1	1	1	1	x	0
+      ***End Table***
+      
+      From the Excitation Table 4.6, we construct K-maps are constructed (see; Figure 4.15). shows the K-maps of the above table. From the K-maps, we find that:
+      
+      *** Insert Figure 4.15 here***
+Figure 4.15?K-maps for Table 4.6.
+      
+	S= Sel  Din
+	R= Sel 
+	O1 = Sel  Din + Sel RW Q = R + Sel RW Q         for sel =1
+	O1 = Z             for Sel = 0
+      
+      The logic symbol and logic diagram of the cell isare shown in Figures 4.16a and 4.16b, respectively.
+      
+      *** Insert Figure 4.16 here***
+Figure 4.16?mSRAM memory cell. a) Logic symbol. b) Logic diagram.
+      
+      The code ofor the memory cell is shown in Listing 4.20. TheIn VHDL code uses, we use the SR- latch that we designed in Listing 4.14 as a component (macro), using the statement:
+      
+       component SR_Latch
+       port (I1, I2 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+      
+which declares a generic SR- latch. TWe link this latch is linked to theour code of memory cell code by the statement:
+      
+       for all : SR_Latch use entity work.bind22 (SR_Latch);
+      
+      The VHDL statement:
+       SR1 : SR_Latch 	port map (R, S, Q, open);
+      
+assignsing R and S as the inputs of the SR-l Latch SR1. The non-inverted output of the latch is assigned to Q, and the inverted output is left open; open is a VHDL predefined word. 
+
+      For Verilog, we link the module of the SR- latch that we designed in Listing 4.14 to the memory cell
+       code by the statement:
+      
+       SR_Latch RS1 (R, S, Q, Qbar);
+      
+wWhich links the module SR_Latch to the current module memory.
+      
+Listing 4.20?HDL Description of an SRAM Memory Cell—. a) VHDL and . b) Verilog.
+      
+      ***Begin Listing***
+      a) VHDL SRAM Memory Cell Description
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity memory is
+           pPort (Sel, RW, Din : in std_logic; O1: buffer std_logic );
+       [AU: In the above, can we lowercase port for consistency? Thanks.][yes]
+       end memory;
+       
+       architecture memory_str of memory is
+       --Some simulators willould not allow mapping between
+       -- buffer and out. In this
+       -- case, change all out to buffer.
+       
+       component and3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component or2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component bufif1
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component SR_Latch
+           port (I1, I2 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       for all : and3 use entity work.bind3 (and3_0);
+       for all : inv use entity work.bind1 (inv_0);
+       for all : or2 use entity work.bind2 (or2_0);
+       for all : bufif1 use entity work.bind2 (bufif1);
+       for all : SR_Latch use entity work.bind22 (SR_Latch);
+       signal RWb, Dinb, S, S1, R, O11, Q : std_logic;
+       begin
+           in1 : inv port map (RW, RWb);
+           in2 : inv port map (Din, Dinb);
+           a1 : and3 port map (Sel, RWb, Din, S);
+           a2 : and3 port map (Sel, RWb, Dinb, R);
+           SR1 : SR_Latch 	port map (S, R, Q, open);
+       --open is a predefined word;
+       -- it indicates that the port is left open.
+           a3 : and3 port map (Sel, RW, Q, S1);
+           or1 : or2 port map (S1, S, O11);
+           buf1 : bufif1 port map (O11, Sel, O1);
+       end memory_str;
+      
+      ***Begin Verilog***
+      b) Verilog SRAM Memory Cell Description
+       module memory (Sel, RW, Din, O1);
+       input Sel, RW, Din;
+       output O1;
+           not (RWb, RW);
+           not (Dinb, Din);
+           and (S, Sel, RWb, Din);
+           and (R, Sel, RWb, Dinb);
+           SR_Latch RS1 (R, S, Q, Qbar);
+           and (S1, Sel, RW, Q);
+           or (O11, S1, S);
+           bufif1 (O1, O11, Sel);
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+4.4?State Machines
+Synchronous sequential circuits are called “state machines.” The main components of the state machine are latches and flip-flops; additional combinational components may also be present. Synchronous clock pulses are fed to all flip- flops and latches of the machine. There are two types of synchronous sequential circuits: Mealy and Moore circuits. The output or next state of Mealy circuits depends on the inputs and the present state of the flip- flops/latches. The output or next state of the Moore circuit depends only on the present states. Present state and next state for a particular flip- flop are the same pin (output Q).; tThe current state is the value of Q just before the present clock pulse or edge; the next state is the value of Q after the clock pulse or the edge. To analyze a state machine, we perform the following steps:
+      
+      ***Begin Numbered List***
+1. Determine the number of states. If the system is n-bit, then the number of flip- flops is n. The number of flip- flops here is calculated according to the “classical method,” where the number of flip- flops is the minimum possible. AnoOther method in which where each state is represented by one flip-flop is frequently used because analysis of the system here is easier than when usingthat of the the classical method. For example, if the system is 3-bit, then the classical method requires 3three flip- flops, while the one flip-flop per state requires 8eight flip- flops. In this cChapter, we implement the classical method is implemented.
+      
+2. Construct a state diagram that shows the transition between states. At each state, consider it current state; after the clock is active (edge or pulse), the system moves from this current state to next state. Determine the next state according to the input if the system is Mealy, or according to the current state only if the system is Moore. Also, determine the output (if any) of the system at this current state.
+      
+3. From the state diagram, construct the eExcitation tTable thatwhich tabulates the inputs and the outputs. The inputs include the current states, and the outputs include the next states. The tTable also includes the inputs of the flip-flops or latches that constitute the state machine. For example, if the flip- flops implemented in a certain machine are JK flip-flops, then the inputs J and K of the flip- flop are determined according to the transition from current to next state. If, for example, the current state is 0 and the next is 0, then J  = 0 and K  = x (don’t care). If the flip -flops are D flip-flops, then the D’s of the flip -flops are equal to the corresponding next states.
+      
+4. Find J and K in terms of the inputs and minimize using K-maps or any other appropriate methods.
+      
+5. If you are using structural description to simulate the system, draw a logic diagram of the system using appropriate available macros, such as latches, adders, and flip-flops.
+      ***End Numbered List***
+      
+      More details about state machines can be found in [Hayes98], and [Nelson95]. FIn the following arewe cover some examples of state machines. More examples of state machines and counters will be discussed inIn Chapters 6, (“Procedures, Tasks, and Functions”;) and Chapter 7, (“Mixed-Type Modeling.”) we discuss more examples on state machines and counters.
+      
+Example 4.12?Structural Description of a 3-bBit Synchronous Counter with Active Low  
+                           Clear.
+The logic symbol of the counter is shown in Figure 4.17. TWe construct the counter is constructed from  JK flip-flops.
+      
+      *** Insert Figure 4.17 here***
+Figure 4.17?Logic symbol of a 3-bit counter with active low clear.
+      
+      flops. The state diagram of the counter is shown in Figure 4.18. Since the counter counts from 0 to 7, we need 3three flip -flops to cover that count. The transition depends on current state and on the input (clear). The nNext step is to construct the eExcitation tTable.
+      
+      *** Insert Figure 4.18 here***
+Figure 4.18?State diagram of a 3-bit counter with active low clear.
+      
+      Table 4.7a shows the eExcitation tTable of a JK flip- flop, and Table 4.7b shows the eExcitation tTable of the counter.
+      
+Table 4.7a?Excitation Table for a JK Flip-Flop
+      
+      ***Begin Table [COMP: Outputs straddles last three columns.]***
+      
+      Inputs	Outputs
+      Current State	Next State	J	K
+      0	1	1	x
+      0	0	0	x
+      1	0	x	1
+      1	1	x	0
+      ***End Table***
+      
+Table 4.7b?Excitation Table for 3-bBit Synchronous Counter with Active High Clear
+      
+      ***Begin Table *** [COMP: Lots of column spanning here. For example: [X2] will tell you that this heading spans 2 columns. Okay?]
+      
+      Inputs [X4]				Outputs [X6]
+      iInput [X2]		Current State [X2]	Next State [X3]		Flip-Flops [X3]
+      clrbar	q2	q1	q0	q2+	q1+	q0+	J2K2	J1K1	J0K0
+      0	x	x	x	0	0	0	01	01	01
+      1	0	0	0	0	0	1	0x	0x	1x
+      1	0	0	1	0	1	0	0x	1x	x1
+      1	0	1	0	0	1	1	0x	x0	1x
+      1	0	1	1	1	0	0	1x	x1	x1
+      1	1	0	0	1	0	1	x0	0x	1x
+      1	1	0	1	1	1	0	x0	1x	x1
+      1	1	1	0	1	1	1	x0	x0	1x
+      1	1	1	1	0	0	0	x1	x1	x1
+      ***End Table***
+      
+      Now we construct the K-maps of the aboveprevious table. Figure 4.19 shows the K-maps of Table 4.7b.
+      
+      *** Insert Figure 4.19 here***
+Figure 4.19?K-maps of Table 4.7b.
+      
+      From the K-maps: [COMP: Two tabs here, right and left.] we find
+      
+	J0 = clrbar,     	K0 = 1
+	J1 = clrbar q0	     K1 = q0 + 
+	J2 = clrbar q0 q1	     K2 = q0 q1 + 
+      
+      Next w,e draw the logic diagram of the counter (see. Figure 4.20) shows the logic diagram of the counter.
+      
+      *** Insert Figure 4.20 here***
+Figure 4.20?Logic diagram of a 3-bit synchronous counter with active low clear Uusing JK Mmaster-Sslave Fflip-Fflops.
+      
+      Now we write the structural description of the counter. We use tThe previously built macros and modules are used, as well asthat we have built before. We use the JK flip -flop that we designed in Listing 4.17. In VHDL,  wWe declare it as a component:
+      
+       component JK_FF
+           port (I1, I2, I3 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       
+       for all : JK_FF use entity work.bind32 (JK_Master);
+      
+      Tbind32 is the entity where we wrote the code of the JK flip -flop was written is bind32; JK_Master is the name of the architecture.
+      In Verilog, we link the current module to the JK_FF module we designed in Listing 4.17b as:
+      
+       JK_FF FF0 (clrb1, 1'b1, clk, q[0], qb[0]);
+      
+      Listing 4.21 shows the HDL code of the counter. The bBasic VHDL package does not include definitions of the components used in Listing 4.21, JK_FF, inv, and2, or or2. Several CAD vVendors can provide packages that contain these definitions of such components; if these packages are included in Listing 4.21, then there is no need for component declaration statements.
+      
+Listing 4.21?HDL Description of a 3-bBit Synchronous Counter Using JK Master-Slave Flip-Flops—. a) VHDL and . b) Verilog.
+      
+      ***Begin Listing***
+      a) VHDL 3-Bit Synchronous Counter Using JK Master-Slave Flip-FlopsDescription
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity countr_3 is
+           port (clk, clrbar : in std_logic; 
+                 q, qb : buffer std_logic_vector(2 downto 0));
+       [AU: Please re-break line above. Is too long.][done]
+       end countr_3;
+       
+       architecture CNTR3 of countr_3 is
+       --Start component declaration statements
+       
+       --Some simulators willould not allow mapping between
+       -- buffer and out. In this
+       -- case, change all out to buffer.
+       
+       component JK_FF
+           port (I1, I2, I3 : in std_logic; O1, O2 : buffer std_logic);
+        end component;
+       
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component or2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       for all : JK_FF use entity work.bind32 (JK_Master);
+       for all : inv use entity work.bind1 (inv_0);
+       for all : and2 use entity work.bind2 (and2_0);
+       for all : or2 use entity work.bind2 (or2_0);
+       signal J1, K1, J2, K2, clr, clrb1, s1 : std_logic;
+       begin
+           FF0 : JK_FF port map (clrb1, '1', clk, q(0), qb(0));
+           -- clrb1 has the same logic as clrbar
+       
+           A1 : and2 port map (clrb1, q(0), J1);
+           inv1 : inv port map (clr, clrb1);
+           inv2 : inv port map (clrbar, clr);
+           
+           r1 : or2 port map (q(0), clr, K1);
+           FF1 : JK_FF port map (J1, K1, clk, q(1), qb(1));
+           A2 : and2 port map (q(0), q(1), s1);
+           A3 : and2 port map (clrb1, s1, J2);
+           r2 : or2 port map (s1, clr, K2);
+           FF2 : JK_FF port map (J2, K2, clk, q(2), qb(2));
+       end CNTR3 ;
+      
+      ***Begin Verilog***
+      b) Verilog 3-Bit Synchronous Counter Using JK Master-Slave Flip-FlopsDescription
+       module countr_3 (clk, clrbar, q, qb);
+       input clk, clrbar;
+       output [2:0] q, qb;
+           
+           JK_FF FF0(	clrb1, 1'b1, clk, q[0], qb[0]);
+       // clrb1 has the same logic as clrbar
+           and A1 (J1, q[0], clrb1);
+           
+       /*The name of the and gate “A1” and all other
+        gates in this code are optional; it can be omitted.*/
+           
+           not inv1 (clrb1, clr);
+           not inv2 (clr, clrbar);
+           
+           or r1 (K1, q[0], clr);
+           JK_FF FF1 (J1, K1, clk, q[1], qb[1]);
+           and A2 (s1, q[0], q[1]);
+           and A3 (J2, clrb1, s1);
+           or or2 (K2, s1, clr);
+           JK_FF FF2(	J2, K2, clk, q[2], qb[2]);
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+      The simulation waveform of the counter is shown in Figure 4.21. The waveform shows the clear signal (clrbar) to be synchronous; it has to wait for the clock to be active.
+      
+      *** Insert Figure 4.21 here***
+Figure 4.21?Simulation waveform of 3-bit synchronous counter with active low clear.
+      
+Example 4.13?Structural Description of a 3-bBit Synchronous Even Counter with Active High Hold.
+The counter here is counting up. The number of flip- flops is 3three. First, we draw the state diagram of the counter, as shown in. Figure 4.22 shows the state diagram of the counter. For all even current states, the next state is the next even.; fFor example, if the current state is 010 (2), then the next state is 100 (4). For any odd state whichthat is invalid,; the next state can be any state that ensures the continuity of the count. For example, if the current state is the invalid state 001, the next state can be 000 for example. In the case of invalid states, we choose the next state that yields tohe minimum number of minterms.; tThis will be explained when we form the excitation table is formed.
+      
+      *** Insert Figure 4.22 here***
+Figure 4.22?State diagram of an even 3-bit counter. T; the Hold is shown in the diagram as input.
+      
+      From the state diagram, we generate the excitation table. Table 4.8 shows the excitation table of the counter using D flip-flops. The D’s of the flip- flop are the same as the next state.
+      
+Table 4.8?Excitation Table for a 3-bBit Even Counter
+      
+      ***Begin Table*** [COMP: See Table 4.7 for column straddle designation (e.g., [X2], etc.).]
+      Input [X4]			Output [X3]		Flip-Flops [X3]
+      Current state [X4]		Next State [X3]
+      H	Q2	Q1	Q0	Q2+	Q1+ 	Q0+	D2	D1	D0
+      0	0	0	0	0	1	0	0	1	0
+      0	0	0	1	0	1	0	0	0	0
+      0	0	1	0	1	0	0	1	0	0
+      0	0	1	1	1	0	0	0	0	0
+      0	1	0	0	1	1	0	1	1	0
+      0	1	0	1	0	1	0	0	0	0
+      0	1	1	0	0	0	0	0	0	0
+      0	1	1	1	0	0	0	0	0	0
+      1	0	0	0	0	0	0	0	0	0
+      1	0	0	1	0	0	0	0	0	0
+      1	0	1	0	0	1	0	0	1	0
+      1	0	1	1	0	0	0	0	0	0
+      1	1	0	0	1	0	0	1	0	0
+      1	1	0	1	0	0	0	0	0	0
+      1	1	1	0	1	1	0	1	1	0
+      1	1	1	1	0	0	0	0	0	0
+      ***End Table***
+      
+      From the excitation table, we generate the K-maps. Figure 4.23 shows the K-maps of the counter. Referring to the K-maps, for odd states, we can assign any next state can be assigned, since odd states are not valid. The only restriction is that the next state should yield to a valid state. We select the next state that yields to elimination of more terms. For example, if the current state is 101, we select the next state 100; this yields to less minterms.
+      
+      *** Insert Figure 4.23 here***
+Figure 4.23?K-maps of an even 3-bit counter.
+      
+      From the K-maps, we find the Boolean functions:
+      
+	D0 = 0
+	D1 =  + HQ1
+	D2 = Q2 + HQ2 + Q1
+      
+      Using the above the Boolean functions, we draw the logic diagram of the counter. Figure 4.24 shows the logic symbol and logic diagram of the counter.
+      
+      *** Insert Figure 4.24a and 4.24b here***
+Figure 4.24?3Three-bit even counter. a) Logic symbol. b) Logic diagram.
+      [AU: In Figure 4.24a, please line all of the Q’s up at the top, vertically. In 4.24b, Please move Q2 off of the line. Thanks.][done]
+      
+      Next, we write the HDL code for the counter. TWe use the macros for the D master-slave flip -flops that we developed in Listing 4.16 are used. In VHDL code, we write:
+      
+       component D_FF
+       port (I1, I2 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       
+       for all : D_FF use entity work.bind22 (D_FFMaster);
+      
+      In Verilog, we write the code that links the D_FFMaster that we designed in Listing 4.16 to the newour module:
+      
+       D_FFMaster DFF1 (OR1, clk, Q[1], Qbar[1]);
+      
+      Listing 4.22 shows the HDL code of the counter.
+      
+Listing 4.22?HDL Description of a 3-bBit Synchronous Even Counter with Hold— a) VHDL and . b) Verilog.
+      
+      ***Begin Listing***
+      a) VHDL 3-Bit Synchronous Even Counter with HoldDescription
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity CTR_EVEN is
+           port (H, clk : in std_logic;
+               Q, Qbar : buffer std_logic_vector (2 downto 0));
+       end CTR_EVEN;
+       
+       architecture Counter_even of CTR_EVEN is
+       --Some simulators willould not allow mapping between
+       -- buffer and out. In this
+       -- case, change all out to buffer.
+       
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component or2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component or3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component D_FF
+           port (I1, I2 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       
+       
+       for all : D_FF use entity work.bind22 (D_FFMaster);
+       for all : inv use entity work.bind1 (inv_0);
+       for all : and2 use entity work.bind2 (and2_0);
+       for all : and3 use entity work.bind3 (and3_0);
+       for all : or2 use entity work.bind2 (or2_0);
+       for all : or3 use entity work.bind3 (or3_0);
+       signal Hbar, a1, a2, a3, a4, a5, OR11, OR22 : std_logic;
+       begin
+           DFF0 : D_FF port map ('0', clk, Q(0), Qbar(0));
+           inv1 : inv port map (H, Hbar);
+           an1 : and2 port map (Hbar, Qbar(1), a1);
+           an2 : and3 port map (H, Q(1), Qbar(0), a2);
+           r1 : or2 port map (a2, a1, OR11);
+           
+           DFF1 : D_FF port map (OR11, clk, Q(1), Qbar(1));
+           an3 : and3 port map	(Q(2), Qbar(1), Qbar(0), a3);
+           an4 : and3	 port map	 (Qbar(0), H, Q(2), a4);
+           an5 : and3 port map	  (Hbar, Qbar(2), Q(1), a5);
+           r2 : or3 port map (a3, a4, a5, OR22);
+           
+           DFF2 : D_FF port map (OR22, clk, Q(2), Qbar(2));
+       end Counter_even;
+      
+      ***Begin Verilog***
+      b) Verilog 3-Bit Synchronous Even Counter with HoldDescription
+       module CTR_EVEN (H, clk, Q, Qbar);
+       
+       input H, clk;
+       output [2:0] Q, Qbar;
+           D_FFMaster DFF0 (1'b0, clk, Q[0], Qbar[0]);
+           not (Hbar, H);
+           and (a1, Qbar[1], Hbar);
+           and (a2, H, Q[1], Qbar[0]);
+           or (OR1, a1, a2);
+           
+           D_FFMaster DFF1 (OR1, clk, Q[1], Qbar[1]);
+           
+           and (a3, Q[2], Qbar[1], Qbar[0]);
+           and (a4, Qbar[0], H, Q[2]);
+           and (a5, Hbar, Qbar[2], Q[1]);
+           or (OR2, a3, a4, a5);
+           
+           D_FFMaster DFF2 (OR2, clk, Q[2], Qbar[2]);
+       
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+      The simulation waveform of the counter is shown in Figure 4.25. As shown in the fFigure, the Hold is active high. I; if it is high and the clock pulse is present, the counter holds its output Q to the present value. Some transient states may appear in the simulation due to hazards.
+      
+      *** Insert Figure 4.25 here***
+Figure 4.25?Simulation waveform of even counter with hHold .
+      
+Example 4.14?Structural Description of a 3-bBit Synchronous Up/Down Counter.
+The logic symbol of the 3-bit synchronous up/down counter is shown in Figure 4.26. The number of flip -flops is 3three. TC is a terminal count; it is active when the counter completes its count. I; in this example, TC is high when the count is 7. The clear here is active high; if it is high, the output of the counter is reset to zero.
+      
+      *** Insert Figure 4.26 here***
+Figure 4.26?Symbol logic diagram of an Uup/dDown 3-bit counter.
+      
+      The state diagram of the counter is shown in Figure 4.27. The input signal Dir determines whether the counter counts up or down. If Dir = 0, the counter counts down;, if Dir = 1, the counter counts updown. [AU: Okay (from Figure 4.27)?][ok, thanks] TC is an output; it is only high when the count is 7. From the state diagram we form the excitation table of the counter (see. Table 4.9) shows the Excitation Table.
+      
+      *** Insert Figure 4.27 here***
+Figure 4.27?State diagram of 3-bit synchronous up/down counter.
+      
+Table 4.9?Excitation Table for a 3-bBit Up/Down Counter with a Terminal Count, Using JK Master-Slave Flip-Flops
+      
+      ***Begin Table [COMP: Same straddle designation as Table 4.7 (e.g., [X2])***
+      
+      Inputs [X5]				Outputs [X7]
+      
+      iInput [X2]	Current State [X3]	Next State [X2]	Output [X2]	Flip-Flop [X3]
+      
+      Clr 	Dir	Q2	Q1	Q0	Q2+	Q1+	Q0+	TC	J2K2	J1K1	J0K0
+      1	x	x	x	x	0	0	0	0	01	01	01
+      0	0	0	0	0	1	1	1	1	1x	1x	1x
+      0	0	0	0	1	0	0	0	0	0x	0x	x1
+      0	0	0 	1	0	0	0	1	0	0x	x1	1x
+      0	0	0	1	1	0	1	0	0	0x	1x	x1
+      0	0	1	0	0	0	1	1	0	x1	1x	1x
+      0	0	1	0	1	1	0	0	0	x0	0x	x1
+      0	0	1	1	0	1	0	1	0	x0	x1	1x
+      0	0	1	1	1	1	1	0	0	x0	x0	x1
+      0	1	0	0	0	0	0	1	0	0x	0x	1x
+      0	1	0	0	1	0	1	0	0	0x	1x	x1
+      0	1	0	1	0	0	1	1	0	0x	x0	1x
+      0	1	0	1	1	1	0	0	0	1x	x1	x1
+      0	1	1	0	0	1	0	1	0	x0	0x	1x
+      0	1	1	0	1	1	1	0	0	x0	1x	x1	
+      0	1	1	1	0	1	1	1	0	x0	x0	1x
+      0	1	1	1	1	0	0	0	1	x1	x1	x1
+      ***End Table***
+      
+      Next, we use K-maps to find the Boolean function of the outputs. Figure 4.28 shows the K-maps from which. From the K-maps we write the Boolean functions are written.
+      
+      *** Insert Figure 4.28 here***
+Figure 4.28?K-maps of 3-bit synchronous up/down counter.
+      [AU: Please check for equal spacing around the equal signs in Figure 4.28.][done]
+      
+	J0 =+ 0= , K0=  + 1.clr=1
+	J1 = ( + Q1+ Dir Q0),         K1 = (  + Dir Q0) + clr
+	J2=    ( + DirQ1Q0),     K2= ( + DirQ1Q0) + clr
+	TC=  (  + Q0Q1Q2Dir )
+      
+      From the Boolean functions, we draw the logic diagram of the counter, as shown in Figure 4.29.
+      
+      *** Insert Figure 4.29 here***
+Figure 4.29?Logic diagram of a 3-bit synchronous up/down counter (for only J0, J1, K0, and K1).
+      
+      Listing 4.23 shows the HDL code ofor the counter. To reduce the hazards, we use gates with a propagation delay. Four nanoseconds areWe assigned 4 nsec for all primitive gates, except an inverter that iswhere we assigned 1 nsec.
+      
+Listing 4.23?HDL Description of a 3-bBit Synchronous Up/Down Counter with Clear and Terminal Count—. a) VHDL and . b) Verilog.
+      
+      ***Begin Listing***
+      a) VHDL 3-Bit Synchronous Up/Down Counter with Clear and Terminal CountDescription
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity up_down is
+           port (clr, Dir, clk : in std_logic; TC : out std_logic;
+               Q, Qbar : buffer std_logic_vector (2 downto 0));
+       end up_down;
+       
+       architecture Ctr_updown of up_down is
+       --Some simulators willould not allow mapping between
+       -- buffer and out. In this
+       -- case, change all out to buffer.
+       
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component or2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component JK_FF
+       port (I1, I2, I3 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       
+       
+       for all : JK_FF use entity work.bind32 (JK_Master);
+       for all : inv use entity work.bind1 (inv_1);
+       for all : and2 use entity work.bind2 (and2_4);
+       for all : and3 use entity work.bind3 (and3_4);
+       for all : or2 use entity work.bind2 (or2_4);
+       
+       signal clrbar, Dirbar, J1, K1, J2, K2 : std_logic;
+       signal s : std_logic_vector (	11 downto 0);
+       begin
+           in1 : inv port map (clr, clrbar);
+           in2 : inv port map (Dir, Dirbar);
+           an1 : and2 port map (Dirbar, Qbar(0), s(0));
+           an2 : and2 port map (Dir, Q(0), s(1));
+           r1 : or2 port map (	s(0), s(1), s(2));
+           an3 : and2 port map (s(2), clrbar, s(3));
+           r2 : or2 port map (s(3), clr, K1);
+           r3 : or2 port map (s(2), Q(1), s(4));
+           an4 : and2 port map (clrbar, s(4), J1);
+           an5 : and3 port map (Dirbar, Qbar(1), Qbar(0), sS(5));
+       [AU: Could we lowercase s(5) above for consistency?][yes]
+           an6 : and3 port map (Dir, Q(1), Q(0), s(6));
+           r4 : or2 port map (s(6), s(5), s(7));
+           an7 : and2 port map (s(7), clrbar, J2);
+           r5 : or2 port map ( J2, clr, K2);
+           
+           JKFF0 : JK_FF port map (clrbar, '1', clk, Q(0), Qbar(0));
+           JKFF1 : JK_FF port map (J1, K1, clk, Q(1), Qbar(1));
+           JKFF2 : JK_FF port map (J2, K2, clk, Q(2), Qbar(2));
+           
+           an8 : and3 port map (clrbar, Qbar(1), Qbar(0), S(8));
+           an9 : and3 port map (Dirbar, Qbar(2), s(8), S(9));
+       
+       -- For an8 and an9,  we could have used 5-input and gate;
+       --  but we preferred
+       -- to use two and gates with a reasonable number of
+       --  fan-in (3three-input) is preferred. Same
+       -- argument for an10 and an11*/
+       
+           an10 : and3 port map (clrbar, Q(0), Q(1), S(10));
+           an11 : and3 port map (Dir, Q(2), s(10), S(11));
+           r6 : or2 port map ( s(9), s(11), TC);
+       end Ctr_updown;
+      
+      ***Begin Verilog***
+      b) Verilog 3-Bit Synchronous Up/Down Counter with Clear and Terminal CountDescription
+       module up_down (clr, Dir, clk, Q, Qbar, TC);
+       input clr, Dir, clk;
+       output [2:0] Q, Qbar;
+       output TC;
+           not #1 (clrbar, clr);
+           not #1 (Dirbar, Dir);
+           and #4 (s0, Dirbar, Qbar[0]);
+           and #4 (s1, Dir, Q[0]);
+           or #4 (s2, s0, s1);
+           and #4 (s3, s2, clrbar);
+           or #4 (K1, s3, clr);
+           or #4 (s4, s2, Q[1]);
+           and #4 (J1, clrbar, s4);
+           and #4 (s5, Dirbar, Qbar[1], Qbar[0]);
+           and #4 (s6, Dir, Q[1], Q[0]);
+           or #4 (s7, s6, s5);
+           and #4 (J2, s7, clrbar);
+           or #4 ( K2, J2, clr);
+           
+           JK_FF JKFF0 (clrbar, 1'b1, clk, Q[0], Qbar[0]);
+           JK_FF JKFF1 (J1, K1, clk, Q[1], Qbar[1]);
+           JK_FF JKFF2 (J2, K2, clk, Q[2], Qbar[2]);
+           
+           and #4 an8 (s8, clrbar, Qbar[1], Qbar[0]);
+           and #4 an9 (s9, Dirbar, Qbar[2], s8);
+       
+       /* For an8 and an9, awe could have used 5five-input and gate could have been used;
+            but we preferred
+       to use two and gates with a reasonable number of fan-in
+            (3three-input) is preferred. Same argument for an10 and an11*/
+       
+           and #4 an10 (s10, clrbar, Q[0], Q[1]);
+           and #4 an11 (s11, Dir, Q[2], s10);
+           or #4 ( TC, s9, s11);
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+      The simulation waveform of the counter is shown in Figure 4.30.
+      
+      *** Insert Figure 4.30 here***
+Figure 4.30?Simulation waveform of an up/down Ccounter. When the count is 3, the Dir (up/down) changes from down to up count. Due to the synchronous nature of the Dir (up/down) signal, the counter continues counting down to 2, and then starts counting up to 3, 4, 5, and so forth.…..
+      
+Example 4.15?Structural Description of a 3-bBit Synchronous Decade Counter.
+Decade up counters count from 0 to 9, and t. The number of flip- flops to cover all counts is 4four to cover all counts from 0 to 9. The state diagram of the counter is shown in Figure 4.31a. There areWe have invalid states from 10 to 14. If any one of these invalid states is a current state, then the next state can be any state that restoresyields to continuity of the count. As we did before, we select the next states selected that yield to more minimization. This is determined when we generate the K-maps.
+      
+      *** Insert Figure 4.31a here***
+Figure 4.31a?State diagram of a decade counter.
+      
+      Next we construct the excitation table. Table 4.10 shows the eExcitation tTable of the decade counter.
+      
+Table 4.910?Excitation Table for a Decade Counter with a Terminal Count, Using D Master-Slave Flip-Flops
+      
+      ***Begin Table [COMP: Again, column spans are designated [X#].]
+      
+      Inputs [X4]			Outputs [X5]
+      Current State [X4]		Next State [X3]	Output [X2]
+      Q3	Q2	Q1	Q0	Q3+	Q2+	Q1+	Q0+	TC
+      0	0	0	0	0	0	0	1	0
+      0	0	0	1	0	0	1	0	0
+      0	0	1	0	0	0	1	1	0
+      0	0	1	1	0	1	0	0	0
+      0	1	0	0	0	1	0	1	0
+      0	1	0	1	0	1	1	0	0
+      0	1	1	0	0	1	1	1	0
+      0	1	1	1	1	0	0	0	0
+      1	0	0	0	1	0	0	1	0
+      1	0	0	1	0	0	0	0	1
+      1	0	1	0	1	0	1	1	0
+      1	0	1	1	0	1	0	0	0
+      1	1	0	0	1	1	0	1	0
+      1	1	0	1	0	1	0	0	0
+      1	1	1	0	1	1	1	1	0
+      1	1	1	1	0	0	0	0	0
+      ***End Table***
+      
+      All D’s are equal to the corresponding next state. For example, when the current state is 0101 (5), the next state is 0110 (6), and accordingly D0 = 0, D1 = 1, D2 = 1, and D3 = 0. Applying K-maps (Figure 4-31b) to Table 4.9 we find:
+      
+      *** Insert Figure 4.31b here***
+Figure 4.31b?K-maps for a decade counter.
+      
+	D0 = 
+	D1 = Q0 + Q1
+	D2 = Q2 + Q2 + Q1Q0
+	 D3= Q3 + Q0Q1Q2
+	TC = Q0Q3
+      
+      From the Boolean functions, we draw the logic diagram of the counter. Figure 4.32 shows the logic diagram of the counter.
+      
+      *** Insert Figure 4.32 here***
+Figure 4.32?Logic diagram of a decade counter.
+      [AU: In Figure 4.32, please make Q0 in topmost right the same size as the rest.][done]
+      
+      Listing 4.24 shows the HDL code ofor the counter.
+      
+Listing 4.24?HDL Description of a 3-bBit Synchronous Decade Counter with Terminal Count—. a) VHDL and . b) Verilog.
+      
+      ***Begin Listing***
+      a) VHDL 3-Bit Synchronous Decade Counter with Terminal CountDescription
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity decade_ctr is
+           port (clk : in std_logic;
+           Q, Qbar : buffer std_logic_vector (3 downto 0);
+                TC : out std_logic);
+       end decade_ctr;
+       
+       architecture decade_str of decade_ctr is
+       --Some simulators willould not allow mapping between
+       -- buffer and out. In this
+       -- case, change all out to buffer.
+       
+       component buf
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and4
+           port (I1, I2, I3, I4 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component or2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       
+       component or3
+           port (I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component D_FF
+           port (I1, I2 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       
+       
+       for all : D_FF use entity work.bind22 (D_FFMaster);
+       for all : buf use entity work.bind1 (buf_1);
+       for all : and2 use entity work.bind2 (and2_4);
+       for all : and3 use entity work.bind3 (and3_4);
+       for all : and4 use entity work.bind4 (and4_4);
+       for all : or2 use entity work.bind2 (or2_4);
+       for all : or3 use entity work.bind3 (or3_4);
+       signal s : std_logic_vector (6 downto 0);
+       signal D : std_logic_vector (3 downto 0);
+       begin
+       
+           b1 : buf port map (Qbar(0), D(0));
+           DFF0 : D_FF port map (D(0), clk, Q(0), Qbar(0));
+       
+       --Assume and gates and or gates have 4 nsec propagation
+       --delay and invert has 1 nsec.
+           a1 : and3 port map (Qbar(3), Qbar(1), Q(0), s(0));
+           a2 : and2 port map (Q(1), Qbar(0), s(1));
+           r1 : or2 port map (s(0), s(1), D(1));
+           DFF1 : D_FF port map (D(1), clk, Q(1), Qbar(1));
+           
+           a3 : and2 port map (Q(2), Qbar(1), s(2));
+           a4 : and2 port map (Q(2), Qbar(0), s(3));
+           a5 : and3 port map (Q(1), Q(0), Qbar(2), s(4));
+           r2 : or3 port map (s(2), s(3), s(4), D(2));
+           DFF2 : D_FF port map (D(2), clk, Q(2), Qbar(2));
+           
+           a6 : and2 port map (Q(3), Qbar(0), s(5));
+           a7 : and4 port map	  (Q(0), Q(1), Q(2), Qbar(3), s(6));
+           r3 : or2 port map  (s(5), s(6), D(3));
+           DFF3 : D_FF port map (D(3), clk, Q(3), Qbar(3));
+           a8 : and4 port map (Q(0), Qbar(1), Qbar(2), Q(3), TC);
+       
+       end decade_str;
+      
+      ***Begin Verilog***
+      b) Verilog 3-Bit Synchronous Decade Counter with Terminal CountDescription
+       module decade_ctr (clk, Q, Qbar, TC);
+       input clk;
+       output [3:0] Q, Qbar;
+       output TC;
+       wire [3:0] D;
+       wire [6:0] s;
+       buf #1 (D[0], Qbar[0]);
+       D_FFMaster FF0(D[0], clk, Q[0], Qbar[0]);
+       
+       /*Assume and gates and or gates have 4 nsec propagation
+        delay and invert has 1 nsec.*/
+       
+           and #4 (s[0], Qbar[3], Qbar[1], Q[0]);
+           and #4 (s[1], Q[1], Qbar[0]);
+           or #4 (D[1], s[0], s[1]);
+           D_FFMaster FF1 (D[1], clk, Q[1], Qbar[1]);
+           
+           and #4 (s[2],Q[2], Qbar[1]);
+           and #4 (s[3],Q[2], Qbar[0]);
+           and #4 (s[4],Q[1], Q[0], Qbar[2]);
+           
+           or #4 (D[2], s[2], s[3], s[4]);
+           D_FFMaster FF2 (D[2], clk, Q[2], Qbar[2]);
+           
+           and #4 (s[5], Q[3], Qbar[0]);
+           and #4 (s[6], Q[0], Q[1], Q[2], Qbar[3]);
+           or #4 (D[3], s[5], s[6]);
+           D_FFMaster FF3 (D[3], clk, Q[3], Qbar[3]);
+           and #4 (TC, Q[0], Qbar[1], Qbar[2], Q[3]);
+       
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+4.5 ?gGenerate (HDL), gGeneric (VHDL), and pParameter (Verilog)
+The predefined word generate is a predefined word mainly used for repetition of concurrent statements.; iIts counterpart in behavioral description is the for-loop, and it. We can use generate can be used to replicate structural or gate-level description statements. Generate has several formats, ; we cover here one of which is covered here. Seethese formats; in Chapter 7, “Mixed-Type Descriptions” forwe cover more  formats for generate.
+      In VHDL, the format for the generate statement is:
+      
+       L1 : for i in 0 to N generate
+       
+       v1 : inv port map (Y(i), Yb(i));
+       --other concurrent statements
+       end generate;
+      
+      The above generate statement describes N + 1 inverters (assuming inv was declared as an inverter with input Y and output Yb); the input to inverter i is Y(i), and the output is Yb(i). L1 is a required label for the generate statement; the generate statement must have a label..
+      An equivalent generate statement in Verilog is:
+      
+       generate
+       
+       genvar i;
+       for (i = 0; i <= N; i = i + 1)
+           begin : u
+           not (Yb[i], Y[i]);
+           
+       end
+       endgenerate
+      
+      The statement genvar i declares the index i of the generate statement; genvar is a predefined word. U is a label for the predefined word begin; and begin must have a label.
+      In VHDL, 
+       generic, in VHDL and parameter in Verilog, are used to define global constants. The In VHDL generic statement can be placed within entity, component, or instantiation statements. The following generic VHDL statement inside the entity declares N as a global constant of value 3.
+      
+       entity compr_genr is
+       generic (N : integer := 3);
+       port (X, Y : in std_logic_vector (N downto 0); 
+             xgty, xlty, xeqy : buffer std_logic);
+       [AU: Please re-break line above. Is too long.]
+      
+      The following Verilog statement declares N as a global constant with a value of  value =3.
+      
+       parameter N = 3;
+       input [N:0] X, Y;
+      
+      TheIn the following we cover some eExamples cover on generate, generic, and parameter.
+      
+Example 4.16?Structural Description of (N+1)-bBit Magnitude Comparator uUsing Generate Statement
+In Listing 4.19, we described a 3-bit comparator is described. Here we design an (N+1)-bit comparator using the. We use generate statement to replicate the full adder that we designed in Example 4.12. Listing 4.25 shows the HDL code for the (N+1)-bit comparator. Referring to Listing 4.25, the following statements replicate the N+1 inverters, N+1 full adders, and N+1 two-inputs and gates:
+      
+       G1 : for i in 0 to N generate
+       v1 : inv port map (Y(i), Yb(i));
+       FA : full_adder port map (X(i), Yb(i), carry(i), sum(i), carry(i+1));
+       a1 : and2 port map (eq(i), sum(i), eq(i+1));
+       
+       end generate G1;
+      
+      replicate N+1 inverters, N+1 full adders and N+1 2-input and gates. The following Verilog statements also replicate N+1 inverters, N+ 1 full adders, and N+1 2two-inputs and gates.
+      
+       generate
+       
+       genvar i;
+       for (i = 0; i <= N; i = i + 1)
+           begin : u
+           not (Yb[i], Y[i]);
+           FULL_ADDER FA (X[i], Yb[i], carry [i], sum [i], carry[i+1]);
+           and (eq[i + 1], sum[i], eq[i]);
+       end
+      
+Listing 4.25?HDL Description of nN-bBit Magnitude Comparator uUsing Generate Statement—. a) VHDL and . b) Verilog.
+      
+      ***Begin Listing***
+      a) VHDL N-Bit Magnitude Comparator Using Generate StatementDescription
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       
+       entity compr_genr is
+       generic (N : integer := 3);
+       
+           port (X, Y : in std_logic_vector (N downto 0);
+               xgty, xlty, xeqy : buffer std_logic);
+       end compr_genr;
+       
+       architecture cmpare_str of compr_genr is
+       --Some simulators willould not allow mapping between
+       -- buffer and out. In this
+       -- case, change all out to buffer.
+       
+       component full_adder
+           port (I1, I2, I3 : in std_logic; O1, O2 : out std_logic);
+       end component;
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       component nor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       signal sum, Yb : std_logic_vector (N downto 0);
+       signal carry, eq : std_logic_vector (N + 1 downto 0);
+       
+       for all : full_adder use entity work.bind32 (full_add);
+       for all : inv use entity work.bind1 (inv_0);
+       for all : nor2 use entity work.bind2 (nor2_7);
+       for all : and2 use entity work.bind2 (and2_7);
+       begin
+           carry(0) <= '0';
+           eq(0) <= '1';
+       G1 : for i in 0 to N generate
+           v1 : inv port map (Y(i), Yb(i));
+           FA : full_adder port map (X(i), Yb(i), carry(i),
+               sum(i), carry(i+1));
+           a1 : and2 port map (eq(i), sum(i), eq(i+1));
+       
+           end generate G1;
+           xgty <= carry(N+1);
+           xeqy <= eq (N +1);
+           n1 : nor2 port map (xeqy, xgty, xlty);
+       
+       end cmpare_str;
+      
+      ***Begin Verilog***
+      b) Verilog N-Bit Magnitude Comparator Using Generate StatementDescription
+       module compr_genr (X, Y, xgty, xlty, xeqy);
+       parameter N = 3;
+       input [N:0] X, Y;
+       output xgty, xlty, xeqy;
+       wire [N :0] sum, Yb;
+       wire [N+1 : 0] carry, eq;
+           assign carry[0] = 1'b0;
+           assign eq[0] = 1'b1;
+       
+           generate
+       
+       genvar i;
+           for (i = 0; i <= N; i = i + 1)
+               begin : u
+               not (Yb[i], Y[i]);
+       
+       /* The above statement is equivalent to assign Yb = ~Y if
+          outside the generate loop */
+       
+       
+               FULL_ADDER FA(X[i], Yb[i], carry [i], sum [i], carry[i+1]);
+               and (eq[i + 1], sum[i], eq[i]);
+           end
+           endgenerate
+       assign xgty = carry [N+1];
+       assign xeqy = eq [N+1];
+       nor (xlty, xeqy, xgty);
+       
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+Example 4.17?Structural Description of an N-bBit Asynchronous dDown Counter uUsing Generate Statement
+Asynchronous counters differ from synchronous counters in the way the clock is connected to each flip-flop. In synchronous counters, all flip- flops are driven by the same clock. In asynchronous counters, each flip- flop may be driven by a different clock. Figure 4.33 shows an n-bit asynchronous counter using JK flip-flops. The clock of the first flip- flop is the main clock. The clock of the second flip- flop is the output of the first JK flip- flop. We repeat this pattern where the clock of the ith flip- flop is driven by the output of (i–-1)th flip- flop. [AU: In this Example, do n and i refer to the same (variable) number? If so, then for clarity’s sake, it should be one or the other. (I vote for n, because n is more commonly used to denote a variable, as has already been used as such in previous chapters.)][n is the total number of flip-flops; it is fixed for the same counter; i is the order of the flip-flop; it is variable]
+      
+      *** Insert Figure 4.33 here***
+Figure 4.33?Logic diagram of n-bit asynchronous down counter when n = 3.
+      
+      Asynchronous counters suffer from hazards more than synchronous counters does. This is due to the way the clock of each flip- flop is connected. Each flip- flop has to wait until the output of the preceding flip- flop settles. During the period before the flip- flop settles, there will be transient states. Listing 4.26 shows the HDL code for an n-bit asynchronous counter. To use generate statement effectively we should be able to describe the n flip- flops by a general statement that will be replicated. All flip- flops, except the first, have a repeated pattern; the clock of the ith flip- flop is the output of the (i–-1)th. To bring the first flip- flop into this pattern, we concatenate the clock and the Q’s of all flip -flops in one vector.
+      
+       s <= (Q & clk);       --         (VHDL)
+       assign s = {Q, clk};  // (Verilog)
+      
+Listing 4.26?HDL Description of an Nn-bBit Asynchronous dDown Counter uUsing Generate Statement. a)— VHDL and . b) Verilog.
+      
+      ***Begin Listing***
+      a) VHDL N-Bit Asynchronous Down Counter Using GenerateDescription
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity asynch_ctr is
+       Generic (N : integer := 3);
+       
+       -- This is a 3-bit counter. If we need a different number of bits
+       -- of bitsis needed, we simply change the value of N here only.
+       
+           port (clk : in std_logic ;
+               Q, Qbar : buffer std_logic_vector (N-1 downto 0)); [AU: (...((N-1) downto 0))?][both ways are correct]
+       end asynch_ctr;
+       
+       architecture CT_strgnt of asynch_ctr is
+       --Some simulators willould not allow mapping between
+       -- buffer and out. In this
+       -- case, change all out to buffer.
+       
+       component JK_FF is
+           port( I1, I2, I3 : in std_logic; O1, O2 : buffer std_logic);
+       end component ;
+       for all : JK_FF use entity work.bind32 (JK_Master);
+       
+       -- For bind32, see Listing 4.17a
+       
+       signal h, l : std_logic;
+       signal s : std_logic_vector (N downto 0);
+       begin
+           h <= '1';
+           l <= '0';	
+           s <= (Q & clk);
+       
+       -- s is the concatenation of Q and clk. We need
+       -- this concatenation to
+       -- describe the clock of each JK flip-flop.
+       
+       
+           Gnlop : for i in (N-1) downto 0 generate
+       
+           G1 : JK_FF port map (h, h, s(i), Q(i), Qbar(i));
+           end generate GnLop;
+       
+       end CT_strgnt;
+      
+      ***Begin Verilog***
+      b) Verilog N-Bit Asynchronous Down Counter Using GenerateDescription
+       module asynch_ctr (clk, Q, Qbar);
+       parameter N = 3;
+        /* This is a 3-bit counter. If we need a different number of bits
+          is needed
+                    of bits, we simply change the value of N here only.*/
+       input clk;
+       output [N-1:0] Q, Qbar;
+       wire [N:0] s;
+           assign s = {Q, clk};
+       /* s is the concatenation of Q and clk.
+        TWe need this concatenation is needed to describe the clock
+        of each JK flip-flop. */
+       
+           generate
+           genvar i;
+       for (i = 0; i < N; i = i + 1)
+       
+           begin : u
+       
+           JK_FF JKFF0 (1'b1, 1'b1, s[i], Q[i], Qbar[i]);
+       // JK_FF is as shown in Listing 4.17b
+           end
+       
+       endgenerate
+       
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+      Figure 4.34 shows the simulation waveform of the counter with nN = 3. The waveform may contain several transient states.
+      
+      *** Insert Figure 4.34 here***
+Figure 4.34?Simulation waveform of nN-bit asynchronous down counter (nN = 3).
+      
+Example 4.18?Structural Description of an nN-bBit Memory Word uUsing Generate Statement
+In Listing 4.20, we described a single memory cell is described. Here we expand tThis cell is expanded to nN bits using the generate statement. Listing 4.27 shows the HDL code ofor the nN-bit memory word. Referring to Listing 4.27, the VHDL statements
+      
+       G1 : for i in 0 to N generate
+       M : memory_cell port map (sel, R_W, Data_in(i), Data_out(i));
+       
+       end generate;
+      
+and the Verilog statements
+      
+       generate
+       genvar i;
+       for (i = 0; i <= N; i = i + 1)
+           begin : u
+           memory M1 (sel, R_W, Data_in [i], Data_out[i]);
+           end
+       endgenerate
+      
+replicate the memory cell that we designed in Listing 4.29 nN times.
+      
+Listing 4.27?HDL Description of nN-bBit Memory Word uUsing Generate— Statement. a) VHDL and . b) Verilog.
+      
+      
+      ***Begin Listing***
+      a) VHDL N-Bit Memory Word Using GenerateDescription
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity Memory_word is
+           Generic (N : integer := 7);
+       port (Data_in : in std_logic_vector (N downto 0); sel, R_W : in
+           std_logic; Data_out : out std_logic_vector (N downto 0));
+       end Memory_word;
+       
+       architecture Word_generate of Memory_word is
+       component memory_cell
+           Port (Sel, RW, Din : in std_logic; O1 : buffer std_logic );
+       end component;
+       
+       for all : memory_cell use entity work.memory (memory_str);
+           begin
+           G1 : for i in 0 to N generate
+       M : memory_cell port map (sel, R_W, Data_in(i), Data_out(i));
+       
+           end generate;
+       
+       end Word_generate;
+      
+      ***Begin Verilog***
+      b) Verilog N-Bit Memory Word Using GenerateDescription
+       module Memory_Word (Data_in, sel, R_W, Data_out);
+       
+       parameter N = 7;
+       input [N:0] Data_in;
+       input sel, R_W;
+       output [N:0] Data_out;
+       
+           generate
+           genvar i;
+           for (i = 0; i <= N; i = i + 1)
+       
+           begin : u
+           memory M1 (sel, R_W, Data_in [i], Data_out[i]);
+       
+           end
+       
+           endgenerate
+       
+       endmodule
+      
+      ***End Verilog***
+      ***End Listing***
+      
+Listing 4.28?VHDL Code for aAll cComponents uUsed for bBinding in Chapter 4
+       [AU: Since Verilog has quite different scripting rules, is it possible to add a Listing for all Verilog modules used for binding in Chapter 4?][Verilog has built-in gates; no binding needed ]
+      
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity bind1 is
+           port (O1 : out std_logic; I1 : in std_logic);
+       end bind1;
+       architecture inv_0 of bind1 is
+       begin
+           O1 <= not I1;
+       end inv_0;
+       
+       architecture inv_1 of bind1 is
+       begin
+           O1 <= not I1 after 1 ns;
+
+       end inv_1;
+       
+       
+       architecture inv_7 of bind1 is
+       begin
+           O1 <= not I1 after 7 ns;
+       end inv_7;
+       
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity bind2 is
+           port (O1 : out std_logic; I1, I2 : in std_logic);
+       end bind2;
+       
+       architecture xor2_0 of bind2 is
+       begin
+           O1 <= I1 xor I2;
+       end xor2_0;
+       
+       architecture and2_0 of bind2 is
+       begin
+           O1 <= I1 and I2;
+       end and2_0;
+       
+       architecture and2_4 of bind2 is
+       begin
+           O1 <= I1 and I2 after 4 ns;
+       end and2_4;
+       
+       architecture and2_7 of bind2 is
+       begin
+           O1 <= I1 and I2 after 7 ns;
+       end and2_7;
+       
+       architecture or2_0 of bind2 is
+       begin
+           O1 <= I1 or I2;
+       end or2_0;
+       
+       architecture or2_7 of bind2 is
+       begin
+           O1 <= I1 or I2 after 7 ns;
+       end or2_7;
+       
+       architecture nor2_0 of bind2 is
+       begin
+           O1 <= I1 nor I2;
+       end nor2_0;
+
+       
+       architecture nor2_7 of bind2 is
+       begin
+           O1 <= I1 nor I2 after 7 ns;
+       end nor2_7;
+       
+       architecture nor2_4 of bind2 is
+       begin
+           O1 <= I1 nor I2 after 4 ns;
+       end nor2_4;
+       
+       architecture bufif1 of bind2 is
+       begin
+           buf : process (I1, I2)
+           variable tem : std_logic;
+           begin
+       if (I2 ='1')then
+           tem := I1;
+       else
+           tem := 'Z';
+       end if;
+           O1 <= tem;
+           end process buf;
+       end bufif1;
+       
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       
+       entity bind3 is
+           port (O1 : out std_logic; I1, I2, I3 : in std_logic);
+       end bind3;
+       
+       architecture and3_0 of bind3 is
+       begin
+           O1 <= I1 and I2 and I3;
+       end and3_0;
+       
+       architecture and3_7 of bind3 is
+       begin
+           O1 <= I1 and I2 and I3 after 7 ns;
+       end and3_7;
+       
+       architecture or3_0 of bind3 is
+       begin
+           O1 <= I1 or I2 or I3;
+       end or3_0;
+       
+       architecture or3_7 of bind3 is
+       begin
+           O1 <= I1 or I2 or I3 after 7 ns;
+       end or3_7;
+       
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       entity bind22 is
+           Port (O1, O2 : buffer std_logic; I1, I2 : in std_logic);
+       end bind22;
+       
+       architecture HA of bind22 is
+       --Some simulators willould not allow mapping between
+       -- buffer and out. In this
+       --case, change all out to buffer.
+       component xor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+           component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+           end component;
+           for A1 : and2 use entity work.bind2 (and2_0);
+           for X1 : xor2 use entity work.bind2 (xor2_0);
+               begin
+               X1 : xor2 port map (I1, I2, O1);
+               A1 :	 and2 port map (I1, I2, O2);
+           end HA;
+       
+       architecture SR_Latch of bBind22 is [AU: bind22 (see below)? It has references elsewhere in this chapter as lowercase. Also, for the sake of consistence, can we make all port statements lowercase?][done]
+       component nor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : nor2 use entity work.bind2 (nor2_0);
+       begin
+           n1 : nor2 port map (I1, O1, O2);
+           n2 : nor2 port map (I2, O2, O1);
+       end SR_Latch;
+       
+       architecture D_latch of bind22 is
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component nor2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : and2 use entity work.bind2 (and2_4);
+       for all : nor2 use entity work.bind2 (nor2_4);
+       for all : inv use entity work.bind1 (inv_1);
+       signal I2b, s1, s2 : std_logic;
+       begin
+           a1 : and2 port map (I1, I2, s1);
+           a2 : and2 port map (I2b, O1, s2);
+           in1 : inv port map (I2, I2b);
+           in2 : inv port map (O2, O1);
+           n2 : nor2 port map (s1, s2, O2);
+       end D_latch;
+       
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+
+           entity bind32 is
+               pPort (O1, O2 : out std_logic; I1, I2, I3 : in std_logic);
+           end bind32;
+       
+       architecture full_add of bind32 is
+       component HA
+           pPort ( I1, I2 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       component or2
+           pPort ( I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : HA use entity work.bind22 (HA);
+       for all : or2 use entity work.bind2 (or2_0);
+       signal s0, c0, c1 : std_logic;
+       
+       begin
+           HA1 : HA port map (I2, I3, s0, c0);
+           HA2 : HA port map (I1, s0, O1, c1);
+           r1 : or2 port map (c0, c1, O2);
+       end full_add;
+       
+       
+       architecture JK_FF of bind32 is
+       begin
+       P1 : process (I1, I2, I3)
+       variable temp1, temp2 : std_logic;
+       variable jk : std_logic_vector (1 downto 0);
+       begin
+           if rising_edge (I3) then
+           jk := (I1 & I2);
+               case jk is
+                   when "01" => temp1 := '0';
+                   when "10" => temp1 := '1';
+                   when "11" => temp1 := not temp1;
+                   when "00" => temp1 := temp1;
+                   when others => temp1 :='0';
+               end case;
+       O1 <= temp1;
+       temp2 := not temp1;
+       O2 <= temp2;
+       end if;
+       end process P1;
+       end JK_FF;
+      
+4.6?Summary
+In this chapter, we have covered the fundamentals of structural description have been covered. GWe have covered gate-level description has been discussed and and we used it to build more- complex structures (macros). Verilog has built-in gates, such as and, or, nand, nor, and buf. Basic VHDL does not have built-in gates but we can build thesesuch gates by using the predefined word component. Both VHDL and Verilog have the predefined command, generate-for, for replicating structural macros. Table 4.101 shows a list of the VHDL statements that we covered in this chapter along with their Verilog counterparts (if any).
+      
+Table 4.101?Summary of VHDL sStatements and tTheir Verilog Counterparts
+      
+      ***Begin Table***
+      
+      VHDL	Verilog
+       generate	generate
+       port map	bBuilt-in already.
+       and2, or2, xor2, nor2,xnor2, inv	and, or, xor, nor, xnor, not
+      	(The above gates are user-built.)
+       use library	bBuilt-in already.
+      ***End Table***
+      
+4.7?Exercises
+4.1	Design a 4-bit parity generator. The output is 0 for even parity and 1 for odd parity. Write both the VHDL and Verilog codes.
+      
+4.2	Design a 3-bit priority encoder. The input I is a 3-bit, and the output P is 3-bit. I(0), when high, has the highest priority, followed by I(1) and (I2). The output P for highest priority to lowest is 0, 1 , and 2d , respectively. Construct a truth table, minimize, and write both the VHDL and Verilog codes.
+      
+4.3	In Listing 4.19, we use three 1-bit full adders were used for a 3-bit magnitude comparison. Modify the Listing by using one 3-bit adder macro.
+      
+4.4	Design a counter that counts 0, 2, 3, 5, 7, 0, 2, [COMP: Insert ellipse.]…. Using the state machine approach. Show all details of your answer. Write both the VHDL and Verilog codes.
+      
+4.5	Referring to Listing 4.26b (Verilog), change the count from down to up and rewrite the code.
+      
+4.6	Translate the following VHDL code shown in Listing 4.29 to Verilog. What is the logic function of the system?
+      
+Listing 4.29?Code for Problem 4.6
+      
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       
+       entity system is
+           Port (a, b, c : in std_logic; d, e : out std_logic );
+       end system;
+       
+       architecture prob_6 of system is
+       component xor2
+       port ( I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component and2
+       port ( I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component or3
+       port ( I1, I2, I3 : in std_logic; O1 : out std_logic);
+       end component;
+       
+       component inv
+       port ( I1 : in std_logic; O1 : out std_logic);
+       end component;
+       for all : xor2 use entity work.bind2 (xor2_0);
+       for all : and2 use entity work.bind2 (and2_0);
+       for all : inv use entity work.bind1 (inv_0);
+       for all : or3 use entity work.bind3 (or3_0);
+       signal s1, s2, s3, s4, abar, bbar, cbar : std_logic;
+       begin
+       x1 : xor2 port map (a, b, s1);
+       x2 : xor2 port map (s1, c, d);
+       c1 : inv port map (a, abar);
+       c2 : inv port map (b, bbar);
+       c3 : inv port map (a, cbar);
+       a1 : and2 port map (abar, b, s2);
+       a2 : and2 port map (abar, c, s3);
+       a3 : and2 port map (b, c, s4);
+       r1 : or3 port map (s2, s3, s4, e);
+       
+       end prob_6;
+      
+4.7	Add active high clear to the asynchronous counter shown inof Figure 4.33 by adding a clear signal to the macro JK_FF. Use the modified JK flip-flops to rebuild the counter. Write both the VHDL and Verilog codes.
+      
+4.8	Construct a 2two-digit decade counter that. The counter counts from 0 to 99. Use the module 
+of the decade counter in  (Listing 4.24). Write both the VHDL and Verilog codes. (Hint: use the terminal count TC to cascade the decade counters.)
+      
+4.6?References
+[Hayes98] Hayes, J. P., Computer Architecture and Organization, 3d ed.Third Edition,  McGraw Hill, 1998.
+[Nelson95] Nelson V. P., H. T. Nagle HT., B. D.  Carroll, BD  and  J. D. Irwin, JD  Digital Logic Circuit Analysis & Design., Prentice Hall, 1995.
+      
+      ??
+      
+      ??
+      
+      ??
+      
+      ??
+      
+      
+      
+      
+      
+      
+      
+      59
+      
+      
+      
+      
+      

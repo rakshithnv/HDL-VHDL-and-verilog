@@ -1,0 +1,40 @@
+Listing 10.39?Code for Exercise 10.6
+       
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity exercise is
+       
+       port (a : in std_logic_vector (3 downto 0);
+           c : in integer range 0 to 15;
+           b : out std_logic_vector (3 downto 0));
+       
+       
+           end exercise;
+           architecture exercise of exercise is
+           begin
+           shfl : process (a, c)
+           variable result, j : integer;
+               variable temp : std_logic_vector (3 downto 0);
+           begin 
+        
+       
+               result := 0;
+               lop1 : for i in 0 to 3 loop
+                   if a(i) = '1' then
+                   result := result + 2**i;
+                   end if; 
+                   end loop;
+                   if result > c then
+                   lop2 : for i in 0 to 3 loop
+                       j := (i + 3) mod 4;
+                       temp (j) := a(i);
+                       end loop;
+       
+                   end if;
+           b <= temp;
+           end process shfl;
+       
+       
+       end exercise;
+

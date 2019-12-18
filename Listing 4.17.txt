@@ -1,0 +1,85 @@
+Listing 4.17?HDL Description of a Master-Slave JK Flip-Flop—VHDL and Verilog
+      
+      VHDL Master-Slave JK Flip-Flop
+       library IEEE;
+       use IEEE.STD_LOGIC_1164.ALL;
+       
+       entity JK_FF is
+       port (J, K, clk : in std_logic; Q, Qbar : buffer std_logic);
+       
+       -- Q and Qbar are declared buffer so they can be input or output
+       
+       end JK_FF;
+       
+       architecture JK_Master of JK_FF is
+       --Some simulators will not allow mapping between
+       --buffer and out. In this
+       --case, change all out to buffer.
+       
+       component and2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component or2
+           port (I1, I2 : in std_logic; O1 : out std_logic);
+       end component;
+       component inv
+           port (I1 : in std_logic; O1 : out std_logic);
+       end component;
+       component D_flip
+           port (I1, I2 : in std_logic; O1, O2 : buffer std_logic);
+       end component;
+       for all : and2 use entity work.bind2 (and2_4);
+       for all : or2 use entity work.bind2 (or2_4);
+       for all : inv use entity work.bind1 (inv_1);
+       for all : D_flip use entity work.bind22 (D_FFMaster);
+       signal s1, s2, Kb, DD : std_logic;
+       begin
+           a1 : and2 port map (J, Qbar, s1);
+           a2 : and2 port map (Kb, Q, s2);
+           in1 : inv port map (K, Kb);
+           or1 : or2 port map (s1, s2, DD);
+           DFF : D_flip port map (DD, clk, Q, Qbar);
+       end JK_Master;
+      
+      Verilog Master-Slave JK Flip-Flop
+       module JK_FF (J, K, clk, Q, Qbar);
+       input J, K, clk;
+       output Q, Qbar;
+       wire s1, s2;
+           and #4 (s1, J, Qbar);
+           and #4 (s2, Kb, Q);
+           not #1 (Kb, K);
+           or #4 (DD, s1, s2);
+           D_FFMaster D0 (DD, clk, Q, Qbar);
+       endmodule
+       
+       module D_FFMaster (D, clk, Q, Qbar);
+       
+       /* We do not have to rewrite the module if the simulator
+           used can attach it to the above module (JK_FF). */
+       
+       input D, clk;
+       output Q, Qbar;
+       wire clkb, clk2, Q0, Qb0;
+       not #1 (clkb, clk);
+       not #1 (clk2, clkb);
+       D_latch D0 (D, clkb, Q0, Qb0);
+       D_latch D1 (Q0, clk2, Q, Qbar);
+       endmodule
+       
+       module D_latch (D, E, Q, Qbar);
+       input D, E;
+       output Q, Qbar;
+       wire Eb, s1, s2;
+       //assume 4-ns delay for and gate and nor gate,
+       //and 1 ns for inverter
+       and #4 gate1 (s1, D, E);
+       //The name gate1 is optional and could have been omitted.
+       
+           and (s1, D, E);
+           and #4 gate2 (s2, Eb, Q);
+           not #1 (Eb, E);
+           nor #4 (Qbar, s1, s2);
+           not #1 (Q, Qbar);
+       endmodule
+
